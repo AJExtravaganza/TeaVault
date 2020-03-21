@@ -178,7 +178,7 @@ class BrewProfileNameRow extends StatelessWidget {
         builder: (context, activeTeaSession, child) => Row(children: <Widget>[
               Expanded(
                   child: Center(
-                    child: Text('Brew Profile: ${activeTeaSession.brewProfile.name}'),
+                    child: Text('Brew Profile: ${activeTeaSession.brewProfile == BrewProfile.getDefault() ? "Default" : activeTeaSession.brewProfile.name}'),
               ))
             ]));
   }

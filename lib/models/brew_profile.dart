@@ -1,11 +1,21 @@
 import 'package:teavault/models/brewing_vessel.dart';
 
 class BrewProfile {
-  String name;
+  static String _DEFAULTNAME = 'defaultBrewProfileName';
+  String _name;
   int nominalRatio; // expressed as integer n for ratio n:1 water:leaf
   int brewTemperatureCelsius; // expressed in degrees Celsius
   List<int> steepTimings;
   bool isFavorite;
+
+  String get name => this._name == _DEFAULTNAME ? 'Default' : _name;
+  set name(String newName) {
+    if (this == getDefault()) {
+      throw Exception('You cannot change the name of the default BrewProfile');
+    } else {
+      this._name = newName;
+    }
+  }
 
   int get steeps => steepTimings.length;
 
@@ -17,7 +27,7 @@ class BrewProfile {
         'is_favorite': isFavorite
       };
 
-  BrewProfile(this.name, this.nominalRatio, this.brewTemperatureCelsius, this.steepTimings, [this.isFavorite = false]);
+  BrewProfile(this._name, this.nominalRatio, this.brewTemperatureCelsius, this.steepTimings, [this.isFavorite = false]);
 
   static List<int> _trimSteepTimingsList(List<int> steepTimingsList) {
     bool timedSteepFound = false;
@@ -42,7 +52,7 @@ class BrewProfile {
 
   static BrewProfile getDefault() {
     List<int> sampleTimingList = [10, 5, 8, 10, 20, 30, 60];
-    return BrewProfile('Default', 15, 100, sampleTimingList);
+    return BrewProfile(_DEFAULTNAME, 15, 100, sampleTimingList);
   }
 
   double getDose(BrewingVessel vessel) {

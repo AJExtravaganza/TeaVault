@@ -82,6 +82,8 @@ class BrewProfileFormState extends State<BrewProfileForm> {
               value = value.trim();
               if (value.isEmpty) {
                 return 'Please enter a name for this profile';
+              } else if (value == BrewProfile.getDefault().name) {
+                return 'The name ${value} is reserved for the app-generated default';
               } else if (!this.editExisting &&
                   _tea.brewProfiles
                       .where((brewProfile) => brewProfile.name == value)
