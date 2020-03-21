@@ -1,12 +1,12 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teavault/main.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
 import 'package:teavault/screens/stash/add_new_tea_to_stash_form.dart';
 import 'package:teavault/screens/stash/brew_profiles_screen.dart';
 import 'package:teavault/tea_session_controller.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class StashView extends StatelessWidget {
   bool suppressTileMenu = false;
@@ -43,7 +43,7 @@ StatelessWidget getAddTeaListItem(BuildContext context) {
   ));
 }
 
-enum StashTileInteraction { brewProfiles }
+enum StashTileInteraction { brewProfiles, changeQuantity, remove }
 
 class StashListItem extends StatelessWidget {
   final Tea tea;
@@ -68,6 +68,10 @@ class StashListItem extends StatelessWidget {
                 onSelected: (StashTileInteraction result) {
                   if (result == StashTileInteraction.brewProfiles) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => BrewProfilesScreen(tea)));
+                  } else if (result == StashTileInteraction.changeQuantity) {
+                    //TODO Implement change quantity
+                  } else if (result == StashTileInteraction.remove) {
+                    Provider.of<TeaCollectionModel>(context, listen: false).remove(tea);
                   } else {
                     throw Exception('You managed to select an invalid StashTileInteraction.  Good job, guy.');
                   }
@@ -76,6 +80,14 @@ class StashListItem extends StatelessWidget {
                   const PopupMenuItem<StashTileInteraction>(
                     value: StashTileInteraction.brewProfiles,
                     child: Text('Brew Profiles'),
+                  ),
+                  const PopupMenuItem<StashTileInteraction>(
+                    value: StashTileInteraction.changeQuantity,
+                    child: Text('Change Quantity'),
+                  ),
+                  const PopupMenuItem<StashTileInteraction>(
+                    value: StashTileInteraction.remove,
+                    child: Text('Remove'),
                   ),
                 ],
               ),

@@ -42,7 +42,7 @@ class TeaCollectionModel extends ChangeNotifier {
       throw Exception('A brew profile named ${brewProfile.name} already exists for this tea');
     }
 
-    _items[tea.id].brewProfiles.add(brewProfile);
+    _items[tea.id].brewProfiles.add(brewProfile); //TODO Is this necessary? Or should we wait for db notification?
     await push(tea);
     notifyListeners();
   }
@@ -56,6 +56,10 @@ class TeaCollectionModel extends ChangeNotifier {
       //ignore if not present
     }
     putBrewProfile(brewProfile, tea);
+  }
+
+  Future remove(Tea tea) async {
+    await fetchUserProfile().then((userProfile) async => await userProfile.reference.collection(dbCollectionName).document(tea.id).delete());
   }
 
   Future<void> push(Tea tea) async {
