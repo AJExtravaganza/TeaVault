@@ -58,24 +58,28 @@ class TeaCollectionModel extends ChangeNotifier {
   }
 
   Future<void> push(Tea tea) async {
-    final userSnapshot = await fetchUser(); //TODO start using static state from enclosing auth class
-    final teasCollection = await userSnapshot.reference.collection(dbCollectionName);
-    await teasCollection.document(tea.id).setData(tea.asMap());
-    notifyListeners();
+    final userSnapshot = await fetchUserProfile();
+    if (userSnapshot != null) {
+      final teasCollection = await userSnapshot.reference.collection(dbCollectionName);
+      await teasCollection.document(tea.id).setData(tea.asMap());
+      notifyListeners();
+    }
   }
 
   Future subscribeToUpdates() async {
-    final userSnapshot = await fetchUser();
-    print('Subscribing to Tea updates');
-    final updateStream = userSnapshot.reference.collection(dbCollectionName).snapshots();
-    updateStream.listen((querySnapshot) {
-      querySnapshot.documentChanges.forEach((documentChange) {
-        final document = documentChange.document;
-        this._items[document.documentID] = Tea.fromDocumentSnapshot(document, productions);
-        print('Got change to Tea ${document.documentID}');
-        notifyListeners();
+    final userSnapshot = await fetchUserProfile();
+    if (userSnapshot != null) {
+      print('Subscribing to Tea updates');
+      final updateStream = userSnapshot.reference.collection(dbCollectionName).snapshots();
+      updateStream.listen((querySnapshot) {
+        querySnapshot.documentChanges.forEach((documentChange) {
+          final document = documentChange.document;
+          this._items[document.documentID] = Tea.fromDocumentSnapshot(document, productions);
+          print('Got change to Tea ${document.documentID}');
+          notifyListeners();
+        });
       });
-    });
+    }
   }
 
   TeaCollectionModel(TeaProductionCollectionModel productions) {

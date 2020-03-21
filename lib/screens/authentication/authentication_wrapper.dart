@@ -4,16 +4,16 @@ import 'package:teavault/services/auth.dart';
 
 //Serves sign-in screen when not logged in, and listens to changes in authentication state
 class AuthenticationWrapper extends StatefulWidget {
-  final Widget child;
+  Function _childBuilder;
 
-  AuthenticationWrapper(this.child);
+  AuthenticationWrapper({@required Function builder}) {this._childBuilder = builder;}
 
   @override
-  State<StatefulWidget> createState() => AuthenticationWrapperState(this.child);
+  State<StatefulWidget> createState() => AuthenticationWrapperState(this._childBuilder);
 }
 
 class AuthenticationWrapperState extends State<AuthenticationWrapper> {
-  final Widget child;
+  final Function _childBuilder ;
   final AuthService _authService = AuthService();
   FirebaseUser _currentUser;
 
@@ -26,7 +26,7 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
     });
   }
 
-  AuthenticationWrapperState(this.child);
+  AuthenticationWrapperState(this._childBuilder);
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
     if (currentUser != null) {
 //      print('Displaying home screen');
-      return this.child;
+      return _childBuilder();
     } else {
       //TODO: Remove this auto-sign-in when proper sign-in and login persistence is implemented
       signInAnonymously();

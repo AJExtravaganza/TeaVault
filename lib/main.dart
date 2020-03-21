@@ -151,7 +151,7 @@ void main() {
 
   runApp(MaterialApp(
       title: 'TeaVault',
-      home: AuthenticationWrapper(MultiProvider(
+      home: AuthenticationWrapper(builder: () => MultiProvider(
         providers: [
           ChangeNotifierProvider<TeaProducerCollectionModel>(
             create: (_) => teaProducerCollectionModel,

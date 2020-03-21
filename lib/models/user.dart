@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<DocumentSnapshot> fetchUser() async {
+Future<DocumentSnapshot> fetchUserProfile() async {
   final user = await FirebaseAuth.instance.currentUser();
-  final userDbRecordSet =
-      await Firestore.instance.collection('users').where('uid', isEqualTo: user.uid).limit(1).getDocuments();
-  final userDbRecord = userDbRecordSet.documents[0];
-  return userDbRecord;
+
+  try {
+    final userDbRecordSet =
+    await Firestore.instance.collection('users').where('uid', isEqualTo: user.uid).limit(1).getDocuments();
+    return userDbRecordSet.documents[0];
+  } on RangeError catch (err) {
+    return null;
+  }
 }
 
-Future<DocumentSnapshot> initialiseNewUser() async {
+Future<DocumentSnapshot> initialiseNewUserProfile() async {
   final userAuth = await FirebaseAuth.instance.currentUser();
   final userDbRecord = await Firestore.instance.collection('users').add(createUserJson(userAuth));
   return userDbRecord.get();
