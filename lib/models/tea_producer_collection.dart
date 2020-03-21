@@ -38,7 +38,11 @@ class TeaProducerCollectionModel extends ChangeNotifier {
     updateStream.listen((querySnapshot) {
       querySnapshot.documentChanges.forEach((documentChange) {
         final document = documentChange.document;
-        this._items[document.documentID] = TeaProducer.fromDocumentSnapshot(document);
+        if (documentChange.type == DocumentChangeType.removed) {
+          this._items.remove(documentChange.document.documentID);
+        } else {
+          this._items[document.documentID] = TeaProducer.fromDocumentSnapshot(document);
+        }
         print('Got change to TeaProducer ${document.documentID}');
         notifyListeners();
       });

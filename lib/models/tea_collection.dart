@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_production_collection.dart';
@@ -74,7 +75,11 @@ class TeaCollectionModel extends ChangeNotifier {
       updateStream.listen((querySnapshot) {
         querySnapshot.documentChanges.forEach((documentChange) {
           final document = documentChange.document;
-          this._items[document.documentID] = Tea.fromDocumentSnapshot(document, productions);
+          if (documentChange.type == DocumentChangeType.removed) {
+            this._items.remove(documentChange.document.documentID);
+          } else {
+            this._items[documentChange.document.documentID] = Tea.fromDocumentSnapshot(document, productions);
+          }
           print('Got change to Tea ${document.documentID}');
           notifyListeners();
         });
