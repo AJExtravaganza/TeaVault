@@ -1,11 +1,13 @@
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
-import 'package:teavault/screens/stash/brew_profile_form.dart';
 import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'brew_profile_form_add.dart';
+import 'brew_profile_form_edit.dart';
 
 class BrewProfilesScreen extends StatelessWidget {
   final Tea _tea;
@@ -49,7 +51,7 @@ class BrewProfilesScreen extends StatelessWidget {
                 child: RaisedButton(
           child: Text("Add New Brew Profile"),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBrewProfile(tea)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBrewProfileScreen(tea)));
           },
         )))
       ],
@@ -95,7 +97,7 @@ class BrewProfilesListItem extends StatelessWidget {
                 onSelected: (BrewProfilesTileInteraction result) {
                   if (result == BrewProfilesTileInteraction.edit) {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => EditBrewProfile(_tea, _brewProfile)));
+                        context, MaterialPageRoute(builder: (context) => EditBrewProfileScreen(_tea, _brewProfile)));
                   } else if (result == BrewProfilesTileInteraction.delete) {
 //              delete();
                   } else {

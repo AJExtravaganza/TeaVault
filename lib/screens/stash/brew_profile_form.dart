@@ -7,75 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AddNewBrewProfile extends StatelessWidget {
-  final Tea _tea;
-
-  AddNewBrewProfile(this._tea);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add New Brew Profile'),
-      ),
-      body: AddNewBrewProfileForm(this._tea),
-    );
-  }
-}
-
-class EditBrewProfile extends StatelessWidget {
-  final Tea _tea;
-  final BrewProfile _brewProfile;
-
-  EditBrewProfile(this._tea, this._brewProfile);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Existing Brew Profile'),
-      ),
-      body: EditBrewProfileForm(this._tea, this._brewProfile),
-    );
-  }
-}
-
 abstract class BrewProfileForm extends StatefulWidget {}
 
-class AddNewBrewProfileForm extends BrewProfileForm {
-  final Tea _tea;
-
-  AddNewBrewProfileForm(this._tea);
-
-  @override
-  _BrewProfileFormState createState() => new _AddBrewProfileFormState(_tea);
-}
-
-class EditBrewProfileForm extends BrewProfileForm {
-  final Tea _tea;
-  final BrewProfile _brewProfile;
-
-  EditBrewProfileForm(this._tea, this._brewProfile);
-
-  @override
-  _BrewProfileFormState createState() => new _EditBrewProfileFormState(_tea, _brewProfile);
-}
-
-class _AddBrewProfileFormState extends _BrewProfileFormState {
-  bool editExisting = false;
-
-  _AddBrewProfileFormState(Tea tea) : super(tea);
-}
-
-class _EditBrewProfileFormState extends _BrewProfileFormState {
-  bool editExisting = true;
-
-  _EditBrewProfileFormState(Tea tea, BrewProfile brewProfile)
-      : super(tea, brewProfile.name, brewProfile.nominalRatio, brewProfile.brewTemperatureCelsius,
-            brewProfile.steepTimings);
-}
-
-class _BrewProfileFormState extends State<BrewProfileForm> {
+class BrewProfileFormState extends State<BrewProfileForm> {
   final _formKey = GlobalKey<FormState>();
   bool editExisting;
 
@@ -86,7 +20,7 @@ class _BrewProfileFormState extends State<BrewProfileForm> {
   int _brewTemperatureCelsius;
   List<int> _steepTimings = [];
 
-  _BrewProfileFormState(this._tea,
+  BrewProfileFormState(this._tea,
       [this._name = '', this._nominalRatio = 15, this._brewTemperatureCelsius = 100, this._steepTimings]);
 
   //  Necessary for TextFormField select-all-on-focus
