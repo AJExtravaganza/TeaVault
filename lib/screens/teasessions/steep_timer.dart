@@ -43,7 +43,7 @@ class TimerDisplayRow extends StatelessWidget {
         builder: (context, activeTeaSession, child) => Row(
               children: <Widget>[
                 Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: Container(),
                 ),
                 Expanded(
@@ -56,7 +56,7 @@ class TimerDisplayRow extends StatelessWidget {
                   child: TimerMuteIconButton(),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: Container(),
                 ),
               ],
