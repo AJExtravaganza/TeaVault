@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "377832769758",
+    "firebase_url": "https://dead-leaves-club.firebaseio.com",
+    "project_id": "dead-leaves-club",
+    "storage_bucket": "dead-leaves-club.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377832769758:android:c96e56a7a647475c149a4f",
+        "android_client_info": {
+          "package_name": "club.deadleaves.teavault"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377832769758-nmhubq51d36lldpk6lmccue8ee7jmmn5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjAZEN4Sppej0Q91WWa2Esb26JXvfPx2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377832769758-nmhubq51d36lldpk6lmccue8ee7jmmn5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
