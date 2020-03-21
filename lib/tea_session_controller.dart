@@ -103,6 +103,8 @@ class TeaSessionController extends ChangeNotifier {
         _brewProfile = _currentTea.brewProfiles.singleWhere((brewProfile) => brewProfile == _brewProfile);
       }
     }
+
+    notifyListeners();
   }
 
   TeaSessionController(TeaCollectionModel teaCollectionModel) {
