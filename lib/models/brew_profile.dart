@@ -48,4 +48,7 @@ class BrewProfile {
   double getDose(BrewingVessel vessel) {
     return vessel.volumeMilliliters / this.nominalRatio;
   }
+
+  @override
+  bool operator ==(other) =>  other.name == this.name;
 }

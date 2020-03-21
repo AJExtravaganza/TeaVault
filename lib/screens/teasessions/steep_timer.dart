@@ -1,3 +1,4 @@
+import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -132,6 +133,9 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
     int buttonFlex = orientation == portrait ? 15 : 20;
     int timerPickerFlex = orientation == portrait ? 50 : 40;
 
+    bool showSaveButton = (teaSessionController.currentTea != null
+        && teaSessionController.brewProfile != BrewProfile.getDefault());
+
     return Container(
         height: 200,
         color: Colors.transparent,
@@ -146,7 +150,7 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
               children: <Widget>[
                 Expanded(
                   flex: buttonFlex,
-                  child: teaSessionController.currentTea != null
+                  child: showSaveButton
                       ? IconButton(
                           onPressed: () async {
                             this.teaSessionController.timeRemaining = Duration(seconds: this._selectedValueInSeconds);
