@@ -1,3 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/fa_icon.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea.dart';
@@ -5,11 +10,6 @@ import 'package:teavault/screens/stash/brew_profiles_screen.dart';
 import 'package:teavault/screens/stash/stash.dart';
 import 'package:teavault/screens/teasessions/steep_timer.dart';
 import 'package:teavault/tea_session_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:font_awesome_flutter/fa_icon.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 
 class SessionsView extends StatefulWidget {
   @override
@@ -30,87 +30,145 @@ class _SessionsView extends State<SessionsView> {
     final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
     final bool displaySteepTimer = teaSessionController.currentTea != null && teaSessionController.brewProfile != null;
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Expanded(
-        flex: 2,
-        child: BrewProfileInfo(),
-      ),
-      Expanded(
-        flex: 4,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Container(),
-            )
-          ],
+    if (teaSessionController.currentTea == null) {
+      return Column(
+        children: <Widget>[
+          Expanded(
+            flex: 3,
+            child: InitialTeaSelectButton()
+          ),
+          Expanded(
+            flex: 6,
+            child: Container(
+              color: Colors.grey,
+            ),
+          )
+        ],
+      );
+    } else {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+        Expanded(
+          flex: 2,
+          child: BrewProfileInfo(),
         ),
-      ),
-      Expanded(
-        flex: 3,
-        child: displaySteepTimer ? SteepTimer() : Container(),
-      )
-    ]);
+        Expanded(
+          flex: 4,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(),
+              )
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: displaySteepTimer ? SteepTimer() : Container(),
+        )
+      ]);
+    }
   }
 
   Widget _landscapeSessionsView(BuildContext context) {
     final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
     final bool displaySteepTimer = teaSessionController.currentTea != null && teaSessionController.brewProfile != null;
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Expanded(
-        flex: 3,
-        child: BrewProfileInfo(),
-      ),
-      Expanded(
-        flex: 3,
-        child: displaySteepTimer ? SteepTimer() : Container(),
-      )
-    ]);
+    if (teaSessionController.currentTea == null) {
+      return Column(
+        children: <Widget>[
+          Expanded(
+            flex: 3,
+            child: InitialTeaSelectButton(),
+          ),
+          Expanded(
+            flex: 6,
+            child: Container(
+              color: Colors.grey,
+            ),
+          )
+        ],
+      );
+    } else {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+        Expanded(
+          flex: 3,
+          child: BrewProfileInfo(),
+        ),
+        Expanded(
+          flex: 3,
+          child: displaySteepTimer ? SteepTimer() : Container(),
+        )
+      ]);
+    }
   }
+}
+
+class InitialTeaSelectButton extends StatelessWidget {
+  final padding = {
+    Orientation.portrait: EdgeInsets.symmetric(vertical: 50, horizontal: 30),
+    Orientation.landscape: EdgeInsets.symmetric(vertical: 10, horizontal: 100)
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+
+
+
+    return Container(
+      padding: padding[orientation],
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40.0),
+          side: BorderSide(color: Colors.black38),
+        ),
+        color: Colors.white70,
+        onPressed: () {
+          selectTeaFromStash(context);
+        },
+        child: Center(
+            child: Column(children: <Widget>[
+              Expanded(
+                flex: 7,
+                child: Align(child: Text(
+                  'Welcome to TeaVault!',
+                  style: TextStyle(fontSize: 24),
+                ),
+                  alignment: Alignment.bottomCenter,),
+              ),
+              Expanded(
+                flex: 4,
+                child: Text('  Select a tea to get started...'),
+              )
+            ])),
+      ),
+    );
+  }
+
 }
 
 class BrewProfileInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Tea currentTea = Provider.of<TeaSessionController>(context).currentTea;
-    if (currentTea == null) {
-      return Material(
-          borderRadius: (BorderRadius.only(bottomLeft: Radius.circular(40.0), bottomRight: Radius.circular(40.0))),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () {
-              selectTeaFromStash(context);
-            },
-            child: Center(
-                child: Column(children: <Widget>[
-                  Text(
-                    '\n\nWelcome to TeaVault!',
-                    style: TextStyle(fontSize: 24),
-              ),
-              Text('  Select a tea to get started...')
-            ])),
-          ));
-    } else {
-      return Column(
-        children: <Widget>[
-          Expanded(
-            flex: 3,
-            child: Container(),
-          ),
-          Expanded(flex: 6, child: TeaNameRow()),
-          Expanded(
-              flex: 6,
-              child: Column(
-                children: [BrewingParametersRow(), BrewProfileNameRow()],
-              )),
-//          Expanded(flex: 3, child: BrewingParametersRow()),
-          Expanded(
-            flex: 1,
-            child: Container(),
-          ),
-        ],
-      );
-    }
+    return Column(
+      children: <Widget>[
+        Expanded(
+          flex: 3,
+          child: Container(),
+        ),
+        Expanded(flex: 6, child: TeaNameRow()),
+        Expanded(
+            flex: 6,
+            child: Column(
+              children: [BrewingParametersRow(), BrewProfileNameRow()],
+            )),
+        Expanded(
+          flex: 1,
+          child: Container(),
+        ),
+      ],
+    );
   }
 }
 
@@ -139,11 +197,9 @@ void selectTeaFromStash(BuildContext context) {
           context,
           MaterialPageRoute(
               builder: (context) => BrewProfilesScreen(
-                teaSessionController.currentTea,
-                suppressTileMenu: true,
-              )
-          )
-      );
+                    teaSessionController.currentTea,
+                    suppressTileMenu: true,
+                  )));
     }
   });
 }
@@ -178,7 +234,8 @@ class BrewProfileNameRow extends StatelessWidget {
         builder: (context, activeTeaSession, child) => Row(children: <Widget>[
               Expanded(
                   child: Center(
-                    child: Text('Brew Profile: ${activeTeaSession.brewProfile == BrewProfile.getDefault() ? "Default" : activeTeaSession.brewProfile.name}'),
+                child: Text(
+                    'Brew Profile: ${activeTeaSession.brewProfile == BrewProfile.getDefault() ? "Default" : activeTeaSession.brewProfile.name}'),
               ))
             ]));
   }
@@ -187,12 +244,8 @@ class BrewProfileNameRow extends StatelessWidget {
 class BrewingParametersRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    BrewingVessel currentBrewingVessel = Provider
-        .of<TeaSessionController>(context)
-        .brewingVessel;
-    BrewProfile currentBrewProfile = Provider
-        .of<TeaSessionController>(context)
-        .brewProfile;
+    BrewingVessel currentBrewingVessel = Provider.of<TeaSessionController>(context).brewingVessel;
+    BrewProfile currentBrewProfile = Provider.of<TeaSessionController>(context).brewProfile;
     return Row(children: <Widget>[
       Expanded(
         flex: 10,
