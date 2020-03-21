@@ -26,7 +26,7 @@ class BrewProfilesScreen extends StatelessWidget {
   }
 
   Widget getBrewProfilesListView(Tea _tea, BuildContext context, {suppressTileMenu = false}) {
-    final tea = Provider.of<TeaCollectionModel>(context).getUpdated(_tea);
+    final tea = Provider.of<TeaSessionController>(context).teaCollection.getUpdated(_tea);
     if (tea.brewProfiles.length == 0) {
       return getAddBrewProfileWidget(context, tea);
     }

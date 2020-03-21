@@ -22,7 +22,7 @@ class TeaCollectionModel extends ChangeNotifier {
 
   Tea getUpdated(Tea tea) => (tea != null && _items.containsKey(tea.id)) ? _items[tea.id] : null;
 
-  Future<void> add(Tea tea) async {
+  Future add(Tea tea) async {
     if (_items.containsKey(tea.id)) {
       _items[tea.id].quantity += tea.quantity;
     } else {
@@ -33,7 +33,7 @@ class TeaCollectionModel extends ChangeNotifier {
     await push(tea);
   }
 
-  Future<void> putBrewProfile(BrewProfile brewProfile, Tea tea) async {
+  Future putBrewProfile(BrewProfile brewProfile, Tea tea) async {
     if (_items[tea.id]
             .brewProfiles
             .where((existingBrewProfile) => existingBrewProfile.name == brewProfile.name)
@@ -49,7 +49,7 @@ class TeaCollectionModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateBrewProfile(BrewProfile brewProfile, Tea tea) async {
+  Future updateBrewProfile(BrewProfile brewProfile, Tea tea) async {
     try {
       _items[tea.id].brewProfiles.remove(_items[tea.id]
           .brewProfiles
@@ -64,7 +64,7 @@ class TeaCollectionModel extends ChangeNotifier {
     await fetchUserProfile().then((userProfile) async => await userProfile.reference.collection(dbCollectionName).document(tea.id).delete());
   }
 
-  Future<void> push(Tea tea) async {
+  Future push(Tea tea) async {
     final userSnapshot = await fetchUserProfile();
     if (userSnapshot != null) {
       final teasCollection = await userSnapshot.reference.collection(dbCollectionName);

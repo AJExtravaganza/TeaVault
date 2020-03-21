@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../tea_session_controller.dart';
+
 abstract class BrewProfileForm extends StatefulWidget {}
 
 class BrewProfileFormState extends State<BrewProfileForm> {
@@ -162,14 +164,14 @@ class BrewProfileFormState extends State<BrewProfileForm> {
             textColor: Colors.white,
             child: new Text('Save Brew Profile'),
             onPressed: () async {
-              await brewProfileFormSubmit(Provider.of<TeaCollectionModel>(context, listen: false),
+              await brewProfileFormSubmit(TeaSessionController.getTeaCollection(context),
                   edit: this.editExisting);
             })
       ]),
     );
   }
 
-  void brewProfileFormSubmit(TeaCollectionModel teaCollection, {edit = false}) async {
+  Future brewProfileFormSubmit(TeaCollectionModel teaCollection, {edit = false}) async {
     bool defaultToFavorite = !_tea.hasCustomBrewProfiles || _tea.defaultBrewProfile.name == _name;
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();

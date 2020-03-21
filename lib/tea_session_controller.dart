@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:provider/provider.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea.dart';
@@ -25,6 +26,8 @@ class TeaSessionController extends ChangeNotifier {
   bool _muted = false;
 
   Duration get timeRemaining => _timeRemaining;
+
+  TeaCollectionModel get teaCollection => _teaCollectionModel;
 
   bool get active => _timer != null && _timer.isActive;
 
@@ -85,8 +88,26 @@ class TeaSessionController extends ChangeNotifier {
     await _teaCollectionModel.push(currentTea);
   }
 
+  void onTeaCollectionModelChange() {
+    reloadCurrentTea();
+    notifyListeners();
+  }
+
+  void reloadCurrentTea() {
+    _currentTea = _teaCollectionModel.getUpdated(_currentTea);
+    if (_currentTea != null) {
+      //If the current BrewProfile no longer exists, default it, else update it
+      if (!_currentTea.brewProfiles.any((brewProfile) => this._brewProfile == brewProfile)) {
+        _brewProfile = _currentTea.defaultBrewProfile;
+      } else {
+        _brewProfile = _currentTea.brewProfiles.singleWhere((brewProfile) => brewProfile == _brewProfile);
+      }
+    }
+  }
+
   TeaSessionController(TeaCollectionModel teaCollectionModel) {
     _teaCollectionModel = teaCollectionModel;
+    _teaCollectionModel.addListener(onTeaCollectionModelChange);
 
     _currentTea = null;
     _brewProfile = null;
@@ -172,4 +193,6 @@ class TeaSessionController extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  static getTeaCollection(BuildContext context) => Provider.of<TeaSessionController>(context, listen: false).teaCollection;
 }

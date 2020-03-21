@@ -22,8 +22,8 @@ class StashView extends StatelessWidget {
                   StashListItem(teas.items[index], suppressTileMenu: this.suppressTileMenu)),
         );
 
-    return Consumer<TeaCollectionModel>(
-        builder: (context, teas, child) => Column(children: [stashListWidget(teas), getAddTeaListItem(context)]));
+    return Consumer<TeaSessionController>(
+        builder: (context, teaSessionController, child) => Column(children: [stashListWidget(teaSessionController.teaCollection), getAddTeaListItem(context)]));
   }
 }
 
@@ -71,7 +71,7 @@ class StashListItem extends StatelessWidget {
                   } else if (result == StashTileInteraction.changeQuantity) {
                     //TODO Implement change quantity
                   } else if (result == StashTileInteraction.remove) {
-                    Provider.of<TeaCollectionModel>(context, listen: false).remove(tea);
+                    TeaSessionController.getTeaCollection(context).remove(tea);
                   } else {
                     throw Exception('You managed to select an invalid StashTileInteraction.  Good job, guy.');
                   }

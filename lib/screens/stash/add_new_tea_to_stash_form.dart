@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../tea_session_controller.dart';
+
 class AddNewTeaToStash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -128,7 +130,7 @@ class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
             textColor: Colors.white,
             child: new Text('Add to Stash'),
             onPressed: () async {
-              await addNewTeaFormSubmit(Provider.of<TeaCollectionModel>(context, listen: false));
+              await addNewTeaFormSubmit(TeaSessionController.getTeaCollection(context));
             })
       ]),
     );
