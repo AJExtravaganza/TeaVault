@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea_production.dart';
@@ -6,11 +7,12 @@ import 'package:teavault/models/tea_production_collection.dart';
 enum TeaFormFactor { cake, brick, tuo, mushroomtuo, looseleaf }
 
 class Tea {
+  String _id;
   int quantity;
   TeaProduction production;
   List<BrewProfile> brewProfiles = [];
 
-  String get id => production.id;
+  String get id => this._id;
 
   BrewProfile get defaultBrewProfile {
     if (brewProfiles.length == 0) {
@@ -36,9 +38,14 @@ class Tea {
   }
 
   Tea(this.quantity, this.production, [this.brewProfiles = const []]) {
+    this._id = this.production.id;
     if (this.brewProfiles.isEmpty) {
       this.brewProfiles = [];
     }
+  }
+  
+  static Tea copyFrom(Tea tea) {
+    return new Tea(tea.quantity, tea.production, tea.brewProfiles);
   }
 
   static Tea fromDocumentSnapshot(DocumentSnapshot producerDocument, TeaProductionCollectionModel productions) {

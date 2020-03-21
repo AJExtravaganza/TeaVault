@@ -42,8 +42,10 @@ class TeaCollectionModel extends ChangeNotifier {
       throw Exception('A brew profile named ${brewProfile.name} already exists for this tea');
     }
 
-    _items[tea.id].brewProfiles.add(brewProfile);
-    await push(tea);
+    final updatedTea = Tea.copyFrom(_items[tea.id]);
+    updatedTea.brewProfiles.add(brewProfile);
+    await push(updatedTea);
+
     notifyListeners();
   }
 

@@ -133,13 +133,18 @@ void selectTeaFromStash(BuildContext context) {
   Navigator.push(context, selectTeaRoute);
 
   selectTeaRoute.popped.then((_) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => BrewProfilesScreen(
-                  Provider.of<TeaSessionController>(context).currentTea,
-                  suppressTileMenu: true,
-                )));
+    final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
+    if (teaSessionController.currentTea != null) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => BrewProfilesScreen(
+                teaSessionController.currentTea,
+                suppressTileMenu: true,
+              )
+          )
+      );
+    }
   });
 }
 

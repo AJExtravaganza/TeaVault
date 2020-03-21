@@ -117,7 +117,9 @@ class BrewProfilesListItem extends StatelessWidget {
               ),
         isThreeLine: true,
         onTap: () {
-          Provider.of<TeaSessionController>(context, listen: false).brewProfile = _brewProfile;
+          final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
+          teaSessionController.currentTea = this._tea;
+          teaSessionController.brewProfile = this._brewProfile;
           Navigator.pop(context);
         },
       ),
