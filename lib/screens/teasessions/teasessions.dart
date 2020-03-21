@@ -40,7 +40,7 @@ class _SessionsView extends State<SessionsView> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Container(color: Colors.grey, child: Text('EvaluationAreaStub')),
+              child: Container(),
             )
           ],
         ),
