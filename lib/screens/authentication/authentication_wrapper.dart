@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:teavault/screens/services/auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:teavault/services/auth.dart';
 
 //Serves sign-in screen when not logged in, and listens to changes in authentication state
 class AuthenticationWrapper extends StatefulWidget {
