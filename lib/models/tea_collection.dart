@@ -29,7 +29,7 @@ class TeaCollectionModel extends ChangeNotifier {
       _items[tea.id] = tea;
     }
 
-    notifyListeners();
+//    notifyListeners();
     await push(tea);
   }
 
@@ -46,7 +46,7 @@ class TeaCollectionModel extends ChangeNotifier {
     updatedTea.brewProfiles.add(brewProfile);
     await push(updatedTea);
 
-    notifyListeners();
+//    notifyListeners();
   }
 
   Future updateBrewProfile(BrewProfile brewProfile, Tea tea) async {
@@ -60,6 +60,20 @@ class TeaCollectionModel extends ChangeNotifier {
     putBrewProfile(brewProfile, tea);
   }
 
+  Future removeBrewProfile(BrewProfile brewProfile, Tea tea) async {
+    final newBrewProfiles = tea.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile);
+    if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
+      newBrewProfiles.first.isFavorite = true;
+    }
+    await push(tea);
+  }
+
+  Future setBrewProfileAsFavorite(BrewProfile brewProfile, Tea tea) async {
+    tea.brewProfiles.forEach((existingBrewProfile) {existingBrewProfile.isFavorite = false;});
+    brewProfile.isFavorite = true;
+    await push(tea);
+  }
+
   Future remove(Tea tea) async {
     await fetchUserProfile().then((userProfile) async => await userProfile.reference.collection(dbCollectionName).document(tea.id).delete());
   }
@@ -69,7 +83,7 @@ class TeaCollectionModel extends ChangeNotifier {
     if (userSnapshot != null) {
       final teasCollection = await userSnapshot.reference.collection(dbCollectionName);
       await teasCollection.document(tea.id).setData(tea.asMap());
-      notifyListeners();
+//      notifyListeners();
     }
   }
 

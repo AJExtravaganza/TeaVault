@@ -1,10 +1,9 @@
-import 'package:teavault/models/brew_profile.dart';
-import 'package:teavault/models/tea.dart';
-import 'package:teavault/models/tea_collection.dart';
-import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teavault/models/brew_profile.dart';
+import 'package:teavault/models/tea.dart';
+import 'package:teavault/tea_session_controller.dart';
 
 import 'brew_profile_form_add.dart';
 import 'brew_profile_form_edit.dart';
@@ -30,6 +29,16 @@ class BrewProfilesScreen extends StatelessWidget {
     if (tea.brewProfiles.length == 0) {
       return getAddBrewProfileWidget(context, tea);
     }
+
+    final brewProfilesSorted = tea.brewProfiles.sort((a, b) {
+      if (a.isFavorite && !b.isFavorite) {
+        return -1;
+      } else if (b.isFavorite && !a.isFavorite) {
+        return 1;
+    } else {
+        return a.name.compareTo(b.name);
+    }
+    });
 
     return Column(children: <Widget>[
       Expanded(
@@ -59,7 +68,7 @@ class BrewProfilesScreen extends StatelessWidget {
   }
 }
 
-enum BrewProfilesTileInteraction { edit, setDefault, delete }
+enum BrewProfilesTileInteraction { edit, setFavorite, delete }
 
 class BrewProfilesListItem extends StatelessWidget {
   final BrewProfile _brewProfile;
@@ -98,8 +107,10 @@ class BrewProfilesListItem extends StatelessWidget {
                   if (result == BrewProfilesTileInteraction.edit) {
                     Navigator.push(
                         context, MaterialPageRoute(builder: (context) => EditBrewProfileScreen(_tea, _brewProfile)));
+                  } else if (result == BrewProfilesTileInteraction.setFavorite) {
+                    TeaSessionController.getTeaCollection(context).setBrewProfileAsFavorite(_brewProfile, _tea);
                   } else if (result == BrewProfilesTileInteraction.delete) {
-//              delete();
+                    TeaSessionController.getTeaCollection(context).removeBrewProfile(_brewProfile, _tea);
                   } else {
                     throw Exception('You managed to select an invalid StashTileInteraction.  Good job, guy.');
                   }
@@ -108,6 +119,10 @@ class BrewProfilesListItem extends StatelessWidget {
                   const PopupMenuItem<BrewProfilesTileInteraction>(
                     value: BrewProfilesTileInteraction.edit,
                     child: Text('Edit'),
+                  ),
+                  const PopupMenuItem<BrewProfilesTileInteraction>(
+                    value: BrewProfilesTileInteraction.setFavorite,
+                    child: Text('Set Favorite'),
                   ),
                   const PopupMenuItem<BrewProfilesTileInteraction>(
                     value: BrewProfilesTileInteraction.delete,
