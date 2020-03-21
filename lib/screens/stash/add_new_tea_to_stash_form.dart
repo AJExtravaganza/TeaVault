@@ -139,7 +139,7 @@ class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       _formKey.currentState.save();
       FocusScope.of(context).unfocus(); //Dismiss the keyboard
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Adding new tea to stash...')));
-      await teaCollection.put(Tea(_quantity, _production));
+      await teaCollection.add(Tea(_quantity, _production));
       Navigator.pop(context);
     }
   }

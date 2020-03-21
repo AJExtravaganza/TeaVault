@@ -22,7 +22,7 @@ class TeaCollectionModel extends ChangeNotifier {
 
   Tea getUpdated(Tea tea) => (tea != null && _items.containsKey(tea.id)) ? _items[tea.id] : null;
 
-  Future<void> put(Tea tea) async {
+  Future<void> add(Tea tea) async {
     if (_items.containsKey(tea.id)) {
       _items[tea.id].quantity += tea.quantity;
     } else {
@@ -42,7 +42,7 @@ class TeaCollectionModel extends ChangeNotifier {
       throw Exception('A brew profile named ${brewProfile.name} already exists for this tea');
     }
 
-    _items[tea.id].brewProfiles.add(brewProfile); //TODO Is this necessary? Or should we wait for db notification?
+    _items[tea.id].brewProfiles.add(brewProfile);
     await push(tea);
     notifyListeners();
   }
