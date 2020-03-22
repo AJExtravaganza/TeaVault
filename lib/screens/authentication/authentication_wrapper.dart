@@ -14,13 +14,12 @@ class AuthenticationWrapper extends StatefulWidget {
 
 class AuthenticationWrapperState extends State<AuthenticationWrapper> {
   final Function _childBuilder ;
-  final AuthService _authService = AuthService();
   FirebaseUser _currentUser;
 
   FirebaseUser get currentUser => _currentUser;
 
   Future signInAnonymously() async {
-    final user = await _authService.signInAnonymously();
+    final user = await authService.signInAnonymously();
     setState(() {
       _currentUser = user;
     });
@@ -41,7 +40,7 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
 //      print('No activeUser');
 //    }
 
-    if (currentUser != null) {
+    if (authService.lastKnownUser != null) {
 //      print('Displaying home screen');
       return _childBuilder();
     } else {

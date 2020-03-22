@@ -3,16 +3,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
+import 'package:teavault/models/tea_collection.dart';
 
 enum TeaFormFactor { cake, brick, tuo, mushroomtuo, looseleaf }
 
 class Tea {
   String _id;
   int quantity;
-  TeaProduction production;
+  String _productionId;
+  TeaProduction get production => teaProductionsCollection.getById(_productionId);
   List<BrewProfile> brewProfiles = [];
 
-  String get id => this._id;
+  String get id => this.production.id;
 
   BrewProfile get defaultBrewProfile {
     if (brewProfiles.length == 0) {
@@ -28,31 +30,45 @@ class Tea {
       "${this.production.producer.shortName} ${this.production.productionYear} ${this.production.name}";
 
   Map<String, dynamic> asMap() {
-    final brewProfileList =
-        this.brewProfiles != null ? this.brewProfiles.map((brewProfile) => brewProfile.asMap()).toList() : [];
     return {
       'quantity': this.quantity,
-      'production': production.id,
-      'brew_profiles': brewProfileList,
+      'production': this._productionId,
+      'brew_profiles': this.brewProfiles.map((brewProfile) => brewProfile.asMap()).toList(),
     };
   }
 
-  Tea(this.quantity, this.production, [this.brewProfiles = const []]) {
-    this._id = this.production.id;
+  Tea(this.quantity, this._productionId, [this.brewProfiles = const []]) {
+    this._id = 'PLACEHOLDER'; //TODO: Update this when teas_in_stash is extracted to root-level collection in schema
     if (this.brewProfiles.isEmpty) {
       this.brewProfiles = [];
     }
   }
   
   static Tea copyFrom(Tea tea) {
-    return new Tea(tea.quantity, tea.production, tea.brewProfiles);
+    return new Tea(tea.quantity, tea._productionId, tea.brewProfiles);
   }
 
-  static Tea fromDocumentSnapshot(DocumentSnapshot producerDocument, TeaProductionCollectionModel productions) {
+  static Tea fromDocumentSnapshot(DocumentSnapshot producerDocument) {
     final data = producerDocument.data;
     List<BrewProfile> brewProfiles =
-    List.from(data['brew_profiles'].map((json) => BrewProfile.fromJson(json))); //TODO: Implement
-    return Tea(data['quantity'], productions.getById(data['production']), brewProfiles);
+    List.from(data['brew_profiles'].map((json) => BrewProfile.fromJson(json)));
+    return Tea(data['quantity'], data['production'], brewProfiles);
+  }
+
+  Future setBrewProfileAsFavorite(BrewProfile brewProfile) async {
+    this.brewProfiles.forEach((existingBrewProfile) {
+      existingBrewProfile.isFavorite = false;
+    });
+    brewProfile.isFavorite = true;
+    await teasCollection.push(this);
+  }
+
+  Future removeBrewProfile(BrewProfile brewProfile) async {
+    final newBrewProfiles = this.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile);
+    if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
+      newBrewProfiles.first.isFavorite = true;
+    }
+    await teasCollection.push(this);
   }
 
   bool operator ==(dynamic other) {

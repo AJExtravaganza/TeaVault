@@ -166,20 +166,19 @@ class BrewProfileFormState extends State<BrewProfileForm> {
             textColor: Colors.white,
             child: new Text('Save Brew Profile'),
             onPressed: () async {
-              await brewProfileFormSubmit(TeaSessionController.getTeaCollection(context),
-                  edit: this.editExisting);
+              await brewProfileFormSubmit(edit: this.editExisting);
             })
       ]),
     );
   }
 
-  Future brewProfileFormSubmit(TeaCollectionModel teaCollection, {edit = false}) async {
+  Future brewProfileFormSubmit({edit = false}) async {
     bool defaultToFavorite = !_tea.hasCustomBrewProfiles || _tea.defaultBrewProfile.name == _name;
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       FocusScope.of(context).unfocus(); //Dismiss the keyboard
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Adding new brew profile...')));
-      await teaCollection.updateBrewProfile(
+      await teasCollection.updateBrewProfile(
           BrewProfile(_name, _nominalRatio, _brewTemperatureCelsius, _steepTimings, defaultToFavorite), _tea);
       Navigator.pop(context);
     }

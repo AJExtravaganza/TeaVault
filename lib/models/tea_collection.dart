@@ -1,16 +1,25 @@
 import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
-import 'package:teavault/models/tea_production_collection.dart';
 import 'package:teavault/models/user.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:teavault/services/auth.dart';
 
 class TeaCollectionModel extends ChangeNotifier {
+  //Singleton class to allow global access
+  static final TeaCollectionModel _teaCollectionModel = new TeaCollectionModel._internal();
+
+  factory TeaCollectionModel() {
+    return _teaCollectionModel;
+  }
+
+  TeaCollectionModel._internal();
+
   final String dbCollectionName = 'teas_in_stash';
-  TeaProductionCollectionModel productions;
   Map<String, Tea> _items = {};
+  bool _subscribedToDbChanges = false;
 
   UnmodifiableListView<Tea> get items {
     List<Tea> list = _items.values.toList();
@@ -29,7 +38,6 @@ class TeaCollectionModel extends ChangeNotifier {
       _items[tea.id] = tea;
     }
 
-//    notifyListeners();
     await push(tea);
   }
 
@@ -45,8 +53,6 @@ class TeaCollectionModel extends ChangeNotifier {
     final updatedTea = Tea.copyFrom(_items[tea.id]);
     updatedTea.brewProfiles.add(brewProfile);
     await push(updatedTea);
-
-//    notifyListeners();
   }
 
   Future updateBrewProfile(BrewProfile brewProfile, Tea tea) async {
@@ -60,22 +66,9 @@ class TeaCollectionModel extends ChangeNotifier {
     putBrewProfile(brewProfile, tea);
   }
 
-  Future removeBrewProfile(BrewProfile brewProfile, Tea tea) async {
-    final newBrewProfiles = tea.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile);
-    if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
-      newBrewProfiles.first.isFavorite = true;
-    }
-    await push(tea);
-  }
-
-  Future setBrewProfileAsFavorite(BrewProfile brewProfile, Tea tea) async {
-    tea.brewProfiles.forEach((existingBrewProfile) {existingBrewProfile.isFavorite = false;});
-    brewProfile.isFavorite = true;
-    await push(tea);
-  }
-
   Future remove(Tea tea) async {
-    await fetchUserProfile().then((userProfile) async => await userProfile.reference.collection(dbCollectionName).document(tea.id).delete());
+    await fetchUserProfile().then(
+        (userProfile) async => await userProfile.reference.collection(dbCollectionName).document(tea.id).delete());
   }
 
   Future push(Tea tea) async {
@@ -83,32 +76,33 @@ class TeaCollectionModel extends ChangeNotifier {
     if (userSnapshot != null) {
       final teasCollection = await userSnapshot.reference.collection(dbCollectionName);
       await teasCollection.document(tea.id).setData(tea.asMap());
-//      notifyListeners();
     }
   }
 
-  Future subscribeToUpdates() async {
-    final userSnapshot = await fetchUserProfile();
-    if (userSnapshot != null) {
-      print('Subscribing to Tea updates');
-      final updateStream = userSnapshot.reference.collection(dbCollectionName).snapshots();
+  Future subscribeToDb() async {
+    if (!_subscribedToDbChanges) {
+      _subscribedToDbChanges = true;
+      print('Subscribing to Tea updates using profile id ${authService.lastKnownUserProfileId}');
+
+      //TODO Extract teas_in_stash to root-level collection in schema, then make this look like the other collections.
+      //TODO THEN extract common functionality into a "CollectionModel" superclass.
+      final user = await fetchUserProfile();
+      final updateStream = user.reference.collection(dbCollectionName).snapshots();
+
       updateStream.listen((querySnapshot) {
+        print('Got changes to TeasInStash: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
         querySnapshot.documentChanges.forEach((documentChange) {
           final document = documentChange.document;
           if (documentChange.type == DocumentChangeType.removed) {
             this._items.remove(documentChange.document.documentID);
           } else {
-            this._items[documentChange.document.documentID] = Tea.fromDocumentSnapshot(document, productions);
+            this._items[documentChange.document.documentID] = Tea.fromDocumentSnapshot(document);
           }
-          print('Got change to Tea ${document.documentID}');
           notifyListeners();
         });
       });
     }
   }
-
-  TeaCollectionModel(TeaProductionCollectionModel productions) {
-    this.productions = productions;
-    subscribeToUpdates();
-  }
 }
+
+final teasCollection = TeaCollectionModel();

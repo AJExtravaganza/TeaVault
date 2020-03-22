@@ -12,7 +12,6 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:vibration/vibration.dart';
 
 class TeaSessionController extends ChangeNotifier {
-  TeaCollectionModel _teaCollectionModel;
   Tea _currentTea;
   BrewProfile _brewProfile;
   BrewingVessel brewingVessel;
@@ -26,8 +25,6 @@ class TeaSessionController extends ChangeNotifier {
   bool _muted = false;
 
   Duration get timeRemaining => _timeRemaining;
-
-  TeaCollectionModel get teaCollection => _teaCollectionModel;
 
   bool get active => _timer != null && _timer.isActive;
 
@@ -85,32 +82,10 @@ class TeaSessionController extends ChangeNotifier {
 
   saveSteepTimeToBrewProfile(int steep, int timeInSeconds) async {
     brewProfile.steepTimings[steep] = timeInSeconds;
-    await _teaCollectionModel.push(currentTea);
-  }
-
-  void onTeaCollectionModelChange() {
-    reloadCurrentTea();
-    notifyListeners();
-  }
-
-  void reloadCurrentTea() {
-    _currentTea = _teaCollectionModel.getUpdated(_currentTea);
-    if (_currentTea != null) {
-      //If the current BrewProfile no longer exists, default it, else update it
-      if (!_currentTea.brewProfiles.any((brewProfile) => this._brewProfile == brewProfile)) {
-        _brewProfile = _currentTea.defaultBrewProfile;
-      } else {
-        _brewProfile = _currentTea.brewProfiles.singleWhere((brewProfile) => brewProfile == _brewProfile);
-      }
-    }
-
-    notifyListeners();
+    await teasCollection.push(currentTea);
   }
 
   TeaSessionController(TeaCollectionModel teaCollectionModel) {
-    _teaCollectionModel = teaCollectionModel;
-    _teaCollectionModel.addListener(onTeaCollectionModelChange);
-
     _currentTea = null;
     _brewProfile = null;
     brewingVessel = getSampleVesselList().first;
@@ -195,6 +170,4 @@ class TeaSessionController extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  static getTeaCollection(BuildContext context) => Provider.of<TeaSessionController>(context, listen: false).teaCollection;
 }

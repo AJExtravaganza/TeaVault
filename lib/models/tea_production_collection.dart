@@ -1,15 +1,26 @@
 import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teavault/models/tea_producer_collection.dart';
+import 'package:teavault/services/auth.dart';
 import 'package:teavault/models/tea_production.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:async/async.dart';
 
 class TeaProductionCollectionModel extends ChangeNotifier {
+
+  //Singleton class to allow global access
+  static final TeaProductionCollectionModel _teaProductionCollectionModel = new TeaProductionCollectionModel._internal();
+
+  factory TeaProductionCollectionModel() {
+    return _teaProductionCollectionModel;
+  }
+
+  TeaProductionCollectionModel._internal();
+
   final String dbCollectionName = 'tea_productions';
-  TeaProducerCollectionModel producers;
   Map<String, TeaProduction> _items = {};
+  bool _subscribedToDbChanges = false;
 
   UnmodifiableListView<TeaProduction> get items {
     List<TeaProduction> list = _items.values.toList();
@@ -32,22 +43,37 @@ class TeaProductionCollectionModel extends ChangeNotifier {
     return newDocumentReference;
   }
 
-  TeaProductionCollectionModel(TeaProducerCollectionModel producers) {
-    this.producers = producers;
+  void subscribeToDb() {
+    if (!_subscribedToDbChanges) {
+      _subscribedToDbChanges = true;
+      print('Subscribing to TeaProduction updates using profile id ${authService.lastKnownUserProfileId}');
 
-    print('Subscribing to TeaProduction updates');
-    final updateStream = Firestore.instance.collection(dbCollectionName).snapshots();
-    updateStream.listen((querySnapshot) {
-      querySnapshot.documentChanges.forEach((documentChange) {
-        final document = documentChange.document;
-        if (documentChange.type == DocumentChangeType.removed) {
-          this._items.remove(documentChange.document.documentID);
-        } else {
-          this._items[document.documentID] = TeaProduction.fromDocumentSnapshot(document, producers);
-        }
-        print('Got change to TeaProduction ${document.documentID}');
-        notifyListeners();
+      final globalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
+          'submitted_by_user_with_profile_id', isNull: true).snapshots();
+      Stream updateStream;
+
+      if (authService.lastKnownUserProfileId != null) {
+        final personalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
+            'submitted_by_user_with_profile_id', isEqualTo: authService.lastKnownUserProfileId).snapshots();
+        updateStream = StreamGroup.merge([globalUpdateStream, personalUpdateStream]);
+      } else {
+        updateStream = globalUpdateStream;
+      }
+
+      updateStream.listen((querySnapshot) {
+        print('Got change to TeaProductions: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
+        querySnapshot.documentChanges.forEach((documentChange) {
+          final document = documentChange.document;
+          if (documentChange.type == DocumentChangeType.removed) {
+            this._items.remove(documentChange.document.documentID);
+          } else {
+            this._items[document.documentID] = TeaProduction.fromDocumentSnapshot(document);
+          }
+          notifyListeners();
+        });
       });
-    });
+    }
   }
 }
+
+final teaProductionsCollection = TeaProductionCollectionModel();

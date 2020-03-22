@@ -8,6 +8,8 @@ class BrewProfile {
   List<int> steepTimings;
   bool isFavorite;
 
+  List<int> get trimmedSteepTimings => _trimSteepTimingsList(steepTimings);
+
   String get name => this._name == _DEFAULTNAME ? 'Default' : _name;
   set name(String newName) {
     if (this == getDefault()) {
@@ -61,4 +63,14 @@ class BrewProfile {
 
   @override
   bool operator ==(other) =>  other.name == this.name;
+
+  static int compare(a, b) {
+    if (a.isFavorite && !b.isFavorite) {
+      return -1;
+    } else if (b.isFavorite && !a.isFavorite) {
+      return 1;
+    } else {
+      return a.name.compareTo(b.name);
+    }
+  }
 }
