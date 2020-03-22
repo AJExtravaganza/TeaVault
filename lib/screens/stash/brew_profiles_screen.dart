@@ -23,7 +23,7 @@ class BrewProfilesScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Select a Brew Profile'),
       ),
-      body: BrewProfilesListView(teasCollection.getUpdated(this._tea), suppressTileMenu: this.suppressTileMenu),
+      body: BrewProfilesListView(this._tea, suppressTileMenu: this.suppressTileMenu),
     );
   }
 }
@@ -63,34 +63,33 @@ class BrewProfilesListItem extends StatelessWidget {
         trailing: this.suppressTileMenu
             ? Container(width: 1, height: 1)
             : PopupMenuButton<BrewProfilesTileInteraction>(
-          onSelected: (BrewProfilesTileInteraction result) {
-            if (result == BrewProfilesTileInteraction.edit) {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => EditBrewProfileScreen(_tea, _brewProfile)));
-            } else if (result == BrewProfilesTileInteraction.setFavorite) {
-              _tea.setBrewProfileAsFavorite(_brewProfile);
-            } else if (result == BrewProfilesTileInteraction.delete) {
-              _tea.removeBrewProfile(_brewProfile);
-            } else {
-              throw Exception('You managed to select an invalid StashTileInteraction.  Good job, guy.');
-            }
-          },
-          itemBuilder: (BuildContext context) =>
-          <PopupMenuEntry<BrewProfilesTileInteraction>>[
-            const PopupMenuItem<BrewProfilesTileInteraction>(
-              value: BrewProfilesTileInteraction.edit,
-              child: Text('Edit'),
-            ),
-            const PopupMenuItem<BrewProfilesTileInteraction>(
-              value: BrewProfilesTileInteraction.setFavorite,
-              child: Text('Set Favorite'),
-            ),
-            const PopupMenuItem<BrewProfilesTileInteraction>(
-              value: BrewProfilesTileInteraction.delete,
-              child: Text('Delete'),
-            ),
-          ],
-        ),
+                onSelected: (BrewProfilesTileInteraction result) {
+                  if (result == BrewProfilesTileInteraction.edit) {
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => EditBrewProfileScreen(_tea, _brewProfile)));
+                  } else if (result == BrewProfilesTileInteraction.setFavorite) {
+                    _tea.setBrewProfileAsFavorite(_brewProfile);
+                  } else if (result == BrewProfilesTileInteraction.delete) {
+                    _tea.removeBrewProfile(_brewProfile);
+                  } else {
+                    throw Exception('You managed to select an invalid StashTileInteraction.  Good job, guy.');
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<BrewProfilesTileInteraction>>[
+                  const PopupMenuItem<BrewProfilesTileInteraction>(
+                    value: BrewProfilesTileInteraction.edit,
+                    child: Text('Edit'),
+                  ),
+                  const PopupMenuItem<BrewProfilesTileInteraction>(
+                    value: BrewProfilesTileInteraction.setFavorite,
+                    child: Text('Set Favorite'),
+                  ),
+                  const PopupMenuItem<BrewProfilesTileInteraction>(
+                    value: BrewProfilesTileInteraction.delete,
+                    child: Text('Delete'),
+                  ),
+                ],
+              ),
         isThreeLine: true,
         onTap: () {
           final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
@@ -103,34 +102,29 @@ class BrewProfilesListItem extends StatelessWidget {
   }
 }
 
-class BrewProfilesListView extends StatelessWidget {
-  final Tea tea;
-  final bool suppressTileMenu;
+class BrewProfilesListView extends Consumer<TeaCollectionModel> {
 
-  BrewProfilesListView(this.tea, {this.suppressTileMenu: false});
+  BrewProfilesListView(tea, {suppressTileMenu: false})
+      : super(builder: (context, teas, child) {
+          tea = teas.getUpdated(tea);
 
-  @override
-  Widget build(BuildContext context) {
-    if (tea.brewProfiles.length == 0) {
-      return AddBrewProfileWidget(tea);
-    }
+          if (tea.brewProfiles.length == 0) {
+            return AddBrewProfileWidget(tea);
+          }
 
-    tea.brewProfiles.sort(BrewProfile.compare);
-
-    return Consumer<TeaCollectionModel>(builder: (context, teas, child) => Column(children: <Widget>[
-      Expanded(
-        child: ListView.builder(
-            itemCount: tea.brewProfiles.length,
-            itemBuilder: (BuildContext context, int index) =>
-                BrewProfilesListItem(tea.brewProfiles[index], tea, suppressTileMenu: suppressTileMenu)),
-      ),
-      AddBrewProfileWidget(tea)
-    ]),);
-  }
+          return Column(children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                  itemCount: tea.brewProfiles.length,
+                  itemBuilder: (BuildContext context, int index) =>
+                      BrewProfilesListItem(tea.brewProfiles[index], tea, suppressTileMenu: suppressTileMenu)),
+            ),
+            AddBrewProfileWidget(tea)
+          ]);
+        });
 }
 
 class AddBrewProfileWidget extends StatelessWidget {
-
   final Tea tea;
 
   AddBrewProfileWidget(this.tea);
@@ -139,16 +133,16 @@ class AddBrewProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
         child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Center(
-                    child: RaisedButton(
-                      child: Text("Add New Brew Profile"),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBrewProfileScreen(tea)));
-                      },
-                    )))
-          ],
-        ));
+      children: <Widget>[
+        Expanded(
+            child: Center(
+                child: RaisedButton(
+          child: Text("Add New Brew Profile"),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBrewProfileScreen(tea)));
+          },
+        )))
+      ],
+    ));
   }
 }
