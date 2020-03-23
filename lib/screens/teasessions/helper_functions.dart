@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:teavault/screens/stash/brew_profiles_screen.dart';
 import 'package:teavault/screens/stash/stash.dart';
 import 'package:teavault/tea_session_controller.dart';
+import 'package:vibration/vibration.dart';
 
 void selectTeaFromStash(BuildContext context) {
 //  //TODO: Implement select pot
@@ -36,3 +38,8 @@ void selectTeaFromStash(BuildContext context) {
     }
   });
 }
+
+Function haptic(Function fn) => () {
+  Vibration.vibrate(duration: 10, intensities: [127]);
+  fn();
+};

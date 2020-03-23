@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/tea_session_controller.dart';
+
+import 'helper_functions.dart';
 
 class SteepTimer extends StatelessWidget {
   final TeaSessionController controller;
@@ -80,7 +83,7 @@ class TimerDisplay extends StatelessWidget {
 
     return FlatButton(
       child: timerTextContent,
-      onPressed: () {
+      onPressed: haptic(() {
         controller.stopBrewTimer();
 
         showModalBottomSheet(
@@ -88,7 +91,7 @@ class TimerDisplay extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             backgroundColor: Colors.white,
             builder: (context) => TimerPickerSheetContents(controller, mainContext));
-      },
+      }),
     );
   }
 }
@@ -160,12 +163,12 @@ class TimerPickerSaveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
     return IconButton(
-      onPressed: () async {
+      onPressed: haptic(() async {
         this.controller.timeRemaining = Duration(seconds: state._selectedValueInSeconds);
         Navigator.pop(context);
         Scaffold.of(state.mainContext).showSnackBar(SnackBar(content: Text("Saving change to brew profile...")));
         await controller.saveSteepTimeToBrewProfile(controller.currentSteep, state._selectedValueInSeconds);
-      },
+      }),
       icon: Icon(Icons.save_alt),
       iconSize: 48,
     );
@@ -196,10 +199,10 @@ class TimerPickerSheetDismissButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
     return IconButton(
-      onPressed: () {
+      onPressed: haptic(() {
         controller.timeRemaining = Duration(seconds: state._selectedValueInSeconds);
         Navigator.pop(context);
-      },
+      }),
       icon: Icon(Icons.check_box),
       iconSize: 48,
     );
@@ -234,11 +237,7 @@ class SteepCountRow extends StatelessWidget {
 class TimerIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {},
-      alignment: Alignment.center,
-      icon: Icon(Icons.timelapse),
-    );
+    return Icon(Icons.timelapse);
   }
 }
 
@@ -250,9 +249,7 @@ class TimerMuteIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () {
-        controller.muted = !controller.muted;
-      },
+      onPressed: haptic(()=>controller.muted = !controller.muted),
       alignment: Alignment.center,
       icon: Icon(controller.muted ? Icons.notifications_off : Icons.notifications_active),
     );
@@ -309,7 +306,7 @@ class PreviousSteepButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: controller.decrementSteep,
+      onPressed: haptic(controller.decrementSteep),
       icon: Icon(Icons.arrow_back_ios),
       alignment: Alignment.center,
     );
@@ -325,13 +322,13 @@ class BrewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (controller.active) {
       return IconButton(
-        onPressed: controller.stopBrewTimer,
+        onPressed: haptic(()=>controller.stopBrewTimer()),
         icon: Icon(Icons.pause),
         alignment: Alignment.center,
       );
     } else if (controller.timeRemaining.inSeconds > 0) {
       return IconButton(
-        onPressed: controller.startBrewTimer,
+        onPressed: haptic(()=>controller.startBrewTimer()),
         icon: Icon(Icons.play_arrow),
         alignment: Alignment.center,
       );
@@ -354,7 +351,7 @@ class NextSteepButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        onPressed: () {
+        onPressed: haptic(() {
           final steepTimings = controller.currentBrewProfile.steepTimings;
           if (controller.steepsRemainingInProfile > 1) {
             controller.incrementSteep();
@@ -362,7 +359,7 @@ class NextSteepButton extends StatelessWidget {
             steepTimings.add(0);
             controller.incrementSteep();
           }
-        },
+        }),
         icon: Icon(Icons.arrow_forward_ios));
   }
 }
