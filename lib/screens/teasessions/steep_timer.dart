@@ -3,78 +3,71 @@ import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 
 class SteepTimer extends StatelessWidget {
+
+  final TeaSessionController controller;
+
+  SteepTimer(this.controller);
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: <Widget>[TimerDisplayRow(), SteepCountRow(), SteepTimerControls()],
+      children: <Widget>[TimerDisplayRow(controller), SteepCountRow(controller), SteepTimerControls(controller)],
     );
   }
 }
 
-class SteepCountRow extends StatelessWidget {
-  String getSteepText(int steep) {
-    return steep == 0 ? 'Rinse' : 'Steep ${steep}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<TeaSessionController>(
-        builder: (context, activeTeaSession, child) => Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 10,
-                  child: Text(
-                    getSteepText(activeTeaSession.currentSteep),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              ],
-            ));
-  }
-}
 
 class TimerDisplayRow extends StatelessWidget {
+  final TeaSessionController controller;
+
+  TimerDisplayRow(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<TeaSessionController>(
-        builder: (context, activeTeaSession, child) => Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Container(),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: TimerIconButton(),
-                ),
-                Expanded(flex: 12, child: TimerDisplay()),
-                Expanded(
-                  flex: 2,
-                  child: TimerMuteIconButton(),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Container(),
-                ),
-              ],
-            ));
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: Container(),
+        ),
+        Expanded(
+          flex: 2,
+          child: TimerIconButton(),
+        ),
+        Expanded(flex: 12, child: TimerDisplay(controller)),
+        Expanded(
+          flex: 2,
+          child: TimerMuteIconButton(controller),
+        ),
+        Expanded(
+          flex: 1,
+          child: Container(),
+        ),
+      ],
+    );
   }
 }
 
+
 class TimerDisplay extends StatelessWidget {
+  final TeaSessionController controller;
+
+  TimerDisplay(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    final _context = context;
-    final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
-
-    String currentValueStr = teaSessionController.timeRemaining.toString().split('.').first.substring(2);
+    final mainContext = context;
+    String currentValueStr = controller.timeRemaining
+        .toString()
+        .split('.')
+        .first
+        .substring(2);
 
     Text timerTextContent;
-    if (teaSessionController.timeRemaining.inSeconds == 0 && !teaSessionController.finished) {
-      if (teaSessionController.currentSteep == 0) {
+    if (controller.timeRemaining.inSeconds == 0 && !controller.finished) {
+      if (controller.currentSteep == 0) {
         timerTextContent = Text(
           'FLASH',
           style: TextStyle(height: 1.4, fontSize: 60, fontFamily: 'RobotoMonoCondensed'),
@@ -95,46 +88,50 @@ class TimerDisplay extends StatelessWidget {
     return FlatButton(
       child: timerTextContent,
       onPressed: () {
-        teaSessionController.stopBrewTimer();
+        controller.stopBrewTimer();
 
         showModalBottomSheet(
             context: context,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             backgroundColor: Colors.white,
-            builder: (context) => TimerPickerSheetContents(_context, teaSessionController));
+            builder: (context) => TimerPickerSheetContents(controller, mainContext));
       },
     );
   }
 }
 
-class TimerPickerSheetContents extends StatefulWidget {
-  final TeaSessionController teaSessionController;
-  final BuildContext _parentContext;
 
-  TimerPickerSheetContents(this._parentContext, this.teaSessionController);
+class TimerPickerSheetContents extends StatefulWidget {
+  final TeaSessionController controller;
+  final BuildContext mainContext;
+
+  TimerPickerSheetContents(this.controller, this.mainContext);
 
   @override
-  State<StatefulWidget> createState() => TimerPickerSheetContentsState(this._parentContext, this.teaSessionController);
+  State<StatefulWidget> createState() => TimerPickerSheetContentsState(this.controller, this.mainContext);
 }
 
 class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
-  final TeaSessionController teaSessionController;
-  final BuildContext _parentContext;
+  final TeaSessionController controller;
+  final BuildContext mainContext;
+
   int _selectedValueInSeconds;
 
-  TimerPickerSheetContentsState(this._parentContext, this.teaSessionController);
+  TimerPickerSheetContentsState(this.controller, this.mainContext);
 
   @override
   Widget build(BuildContext context) {
-    _selectedValueInSeconds = teaSessionController.brewProfile.steepTimings[teaSessionController.currentSteep];
+    _selectedValueInSeconds = controller.currentBrewProfile.steepTimings[controller.currentSteep];
     ;
-    final orientation = MediaQuery.of(context).orientation;
+    final orientation = MediaQuery
+        .of(context)
+        .orientation;
     final portrait = Orientation.portrait;
     int buttonFlex = orientation == portrait ? 15 : 20;
     int timerPickerFlex = orientation == portrait ? 50 : 40;
 
-    bool showSaveButton = (teaSessionController.currentTea != null
-        && teaSessionController.brewProfile != BrewProfile.getDefault());
+    bool showSaveButton = (controller.currentTea != null
+        && controller.currentBrewProfile != BrewProfile.getDefault());
 
     return Container(
         height: 200,
@@ -151,18 +148,7 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
                 Expanded(
                   flex: buttonFlex,
                   child: showSaveButton
-                      ? IconButton(
-                          onPressed: () async {
-                            this.teaSessionController.timeRemaining = Duration(seconds: this._selectedValueInSeconds);
-                            Navigator.pop(context);
-                            Scaffold.of(_parentContext)
-                                .showSnackBar(SnackBar(content: Text("Saving change to brew profile...")));
-                            await teaSessionController.saveSteepTimeToBrewProfile(
-                                teaSessionController.currentSteep, this._selectedValueInSeconds);
-                          },
-                          icon: Icon(Icons.save_alt),
-                          iconSize: 48,
-                        )
+                      ? TimerPickerSaveButton(controller)
                       : Container(),
                 ),
                 Expanded(
@@ -171,17 +157,33 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
                 ),
                 Expanded(
                   flex: buttonFlex,
-                  child: IconButton(
-                    onPressed: () {
-                      this.teaSessionController.timeRemaining = Duration(seconds: this._selectedValueInSeconds);
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.check_box),
-                    iconSize: 48,
-                  ),
+                  child: TimerPickerSheetDismissButton(controller),
                 ),
               ],
             )));
+  }
+}
+
+class TimerPickerSaveButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  TimerPickerSaveButton(this.controller);
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
+    return IconButton(
+      onPressed: () async {
+        this.controller.timeRemaining = Duration(seconds: state._selectedValueInSeconds);
+        Navigator.pop(context);
+        Scaffold.of(state.mainContext)
+            .showSnackBar(SnackBar(content: Text("Saving change to brew profile...")));
+        await controller.saveSteepTimeToBrewProfile(
+            controller.currentSteep, state._selectedValueInSeconds);
+      },
+      icon: Icon(Icons.save_alt),
+      iconSize: 48,
+    );
   }
 }
 
@@ -190,13 +192,57 @@ class BrewTimerPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parentWidgetState = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
+    final state = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
     return CupertinoTimerPicker(
         mode: CupertinoTimerPickerMode.ms,
-        initialTimerDuration: Duration(seconds: parentWidgetState._selectedValueInSeconds),
+        initialTimerDuration: Duration(seconds: state._selectedValueInSeconds),
         onTimerDurationChanged: (Duration newDuration) {
-          parentWidgetState._selectedValueInSeconds = newDuration.inSeconds;
+          state._selectedValueInSeconds = newDuration.inSeconds;
         });
+  }
+}
+
+class TimerPickerSheetDismissButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  TimerPickerSheetDismissButton(this.controller);
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<TimerPickerSheetContentsState>();
+    return IconButton(
+      onPressed: () {
+        controller.timeRemaining = Duration(seconds: state._selectedValueInSeconds);
+        Navigator.pop(context);
+      },
+      icon: Icon(Icons.check_box),
+      iconSize: 48,
+    );
+  }
+}
+
+class SteepCountRow extends StatelessWidget {
+  final TeaSessionController controller;
+
+  SteepCountRow(this.controller);
+
+  String getSteepText(int steep) {
+    return steep == 0 ? 'Rinse' : 'Steep $steep';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 10,
+          child: Text(
+            getSteepText(controller.currentSteep),
+            textAlign: TextAlign.center,
+          ),
+        )
+      ],
+    );
   }
 }
 
@@ -212,21 +258,27 @@ class TimerIconButton extends StatelessWidget {
 }
 
 class TimerMuteIconButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  TimerMuteIconButton(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
-
     return IconButton(
       onPressed: () {
-        teaSessionController.muted = !teaSessionController.muted;
+        controller.muted = !controller.muted;
       },
       alignment: Alignment.center,
-      icon: Icon(teaSessionController.muted ? Icons.notifications_off : Icons.notifications_active),
+      icon: Icon(controller.muted ? Icons.notifications_off : Icons.notifications_active),
     );
   }
 }
 
 class SteepTimerControls extends StatelessWidget {
+  final TeaSessionController controller;
+
+  SteepTimerControls(this.controller);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -237,7 +289,7 @@ class SteepTimerControls extends StatelessWidget {
         ),
         Expanded(
           flex: 3,
-          child: PreviousSteepButton(),
+          child: PreviousSteepButton(controller),
         ),
         Expanded(
           flex: 1,
@@ -245,7 +297,7 @@ class SteepTimerControls extends StatelessWidget {
         ),
         Expanded(
           flex: 3,
-          child: BrewButton(),
+          child: BrewButton(controller),
         ),
         Expanded(
           flex: 1,
@@ -253,7 +305,7 @@ class SteepTimerControls extends StatelessWidget {
         ),
         Expanded(
           flex: 3,
-          child: NextSteepButton(),
+          child: NextSteepButton(controller),
         ),
         Expanded(
           flex: 1,
@@ -265,12 +317,14 @@ class SteepTimerControls extends StatelessWidget {
 }
 
 class PreviousSteepButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  PreviousSteepButton(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    final teaSessionController = Provider.of<TeaSessionController>(context);
-
     return IconButton(
-      onPressed: teaSessionController.decrementSteep,
+      onPressed: controller.decrementSteep,
       icon: Icon(Icons.arrow_back_ios),
       alignment: Alignment.center,
     );
@@ -278,19 +332,21 @@ class PreviousSteepButton extends StatelessWidget {
 }
 
 class BrewButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  BrewButton(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
-
-    if (teaSessionController.active) {
+    if (controller.active) {
       return IconButton(
-        onPressed: teaSessionController.stopBrewTimer,
+        onPressed: controller.stopBrewTimer,
         icon: Icon(Icons.pause),
         alignment: Alignment.center,
       );
-    } else if (teaSessionController.timeRemaining.inSeconds > 0) {
+    } else if (controller.timeRemaining.inSeconds > 0) {
       return IconButton(
-        onPressed: teaSessionController.startBrewTimer,
+        onPressed: controller.startBrewTimer,
         icon: Icon(Icons.play_arrow),
         alignment: Alignment.center,
       );
@@ -306,17 +362,20 @@ class BrewButton extends StatelessWidget {
 }
 
 class NextSteepButton extends StatelessWidget {
+  final TeaSessionController controller;
+
+  NextSteepButton(this.controller);
+
   @override
   Widget build(BuildContext context) {
-    final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
     return IconButton(
         onPressed: () {
-          final steepTimings = teaSessionController.brewProfile.steepTimings;
-          if (teaSessionController.steepsRemainingInProfile > 1) {
-            teaSessionController.incrementSteep();
-          } else if (steepTimings[teaSessionController.currentSteep] != 0 || teaSessionController.currentSteep == 0) {
+          final steepTimings = controller.currentBrewProfile.steepTimings;
+          if (controller.steepsRemainingInProfile > 1) {
+            controller.incrementSteep();
+          } else if (steepTimings[controller.currentSteep] != 0 || controller.currentSteep == 0) {
             steepTimings.add(0);
-            teaSessionController.incrementSteep();
+            controller.incrementSteep();
           }
         },
         icon: Icon(Icons.arrow_forward_ios));

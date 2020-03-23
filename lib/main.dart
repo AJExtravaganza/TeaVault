@@ -14,7 +14,7 @@ import 'package:teavault/models/user.dart';
 import 'package:teavault/screens/authentication/authentication_wrapper.dart';
 import 'package:teavault/screens/climate/climate.dart' as climate;
 import 'package:teavault/screens/stash/stash.dart';
-import 'package:teavault/screens/teasessions/teasessions.dart';
+import 'package:teavault/screens/teasessions/tea_session_view.dart';
 import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -139,7 +139,7 @@ class HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin 
             controller: _tabController,
             children: homeTabs.map((Tab tab) {
               if (tab.text == sessionTabLabel) {
-                return SessionsView();
+                return TeaSessionView();
               } else if (tab.text == stashTabLabel) {
                 return StashView();
               } else if (tab.text == climateTabLabel) {

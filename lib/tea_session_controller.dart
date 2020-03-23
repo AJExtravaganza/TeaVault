@@ -14,7 +14,7 @@ import 'package:vibration/vibration.dart';
 class TeaSessionController extends ChangeNotifier {
   Tea _currentTea;
   BrewProfile _brewProfile;
-  BrewingVessel brewingVessel;
+  BrewingVessel currentBrewingVessel;
   int _currentSteep = 0;
 
   Timer _timer;
@@ -35,7 +35,7 @@ class TeaSessionController extends ChangeNotifier {
   int get currentSteep => _currentSteep;
 
   set currentSteep(int value) {
-    if (value >= 0 && value < brewProfile.steepTimings.length) {
+    if (value >= 0 && value < currentBrewProfile.steepTimings.length) {
       _currentSteep = value;
       _resetTimer();
       notifyListeners();
@@ -47,6 +47,12 @@ class TeaSessionController extends ChangeNotifier {
   int get steepsRemainingInProfile => _brewProfile.steepTimings.length - currentSteep;
 
   get currentTea => _currentTea;
+
+  @override
+  void notifyListeners() {
+    print("Notifying listeners of TeaSessionController");
+    super.notifyListeners();
+  }
 
   set currentTea(Tea newTea) {
     _currentTea = newTea;
@@ -60,9 +66,9 @@ class TeaSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  get brewProfile => _brewProfile != null ? _brewProfile : BrewProfile.getDefault();
+  get currentBrewProfile => _brewProfile != null ? _brewProfile : BrewProfile.getDefault();
 
-  set brewProfile(BrewProfile brewProfile) {
+  set currentBrewProfile(BrewProfile brewProfile) {
     _brewProfile = brewProfile;
     _currentSteep = 0;
     _resetTimer();
@@ -81,14 +87,14 @@ class TeaSessionController extends ChangeNotifier {
   }
 
   saveSteepTimeToBrewProfile(int steep, int timeInSeconds) async {
-    brewProfile.steepTimings[steep] = timeInSeconds;
+    currentBrewProfile.steepTimings[steep] = timeInSeconds;
     await teasCollection.push(currentTea);
   }
 
   TeaSessionController(TeaCollectionModel teaCollectionModel) {
     _currentTea = null;
     _brewProfile = null;
-    brewingVessel = getSampleVesselList().first;
+    currentBrewingVessel = getSampleVesselList().first;
 
     Vibration.hasVibrator().then((hasVibration) {
       _deviceHasVibrator = hasVibration;
