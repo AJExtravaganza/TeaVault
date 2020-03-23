@@ -39,7 +39,9 @@ void selectTeaFromStash(BuildContext context) {
   });
 }
 
+void onPressDefaultVibrate() =>   Vibration.vibrate(duration: 10, intensities: [127]);
+
 Function haptic(Function fn) => () {
-  Vibration.vibrate(duration: 10, intensities: [127]);
+  onPressDefaultVibrate();
   fn();
 };

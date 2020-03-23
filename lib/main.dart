@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea_collection.dart';
@@ -12,6 +13,7 @@ import 'package:teavault/models/teapot_collection.dart';
 import 'package:teavault/screens/authentication/authentication_wrapper.dart';
 import 'package:teavault/screens/climate/climate.dart' as climate;
 import 'package:teavault/screens/stash/stash.dart';
+import 'package:teavault/screens/teasessions/helper_functions.dart';
 import 'package:teavault/screens/teasessions/tea_session_view.dart';
 import 'package:teavault/tea_session_controller.dart';
 
@@ -131,6 +133,7 @@ class HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin 
           title: TabBar(
             controller: _tabController,
             tabs: homeTabs,
+            onTap: (_) => onPressDefaultVibrate(),
           ),
         ),
         body: TabBarView(
