@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:teavault/models/tea.dart';
 
@@ -30,7 +27,6 @@ class BrewProfileAddForm extends BrewProfileForm {
   @override
   BrewProfileFormState createState() => new BrewProfileAddFormState(_tea);
 }
-
 
 class BrewProfileAddFormState extends BrewProfileFormState {
   bool editExisting = false;

@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:teavault/screens/teasessions/popup_content.dart';
 import 'package:teavault/screens/teasessions/popup_layout.dart';
-import 'package:flutter/material.dart';
 
 showPopup(BuildContext context, Widget widget, String title, {BuildContext popupContext}) {
   Navigator.push(

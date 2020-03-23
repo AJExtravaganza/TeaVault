@@ -6,14 +6,17 @@ import 'package:teavault/services/auth.dart';
 class AuthenticationWrapper extends StatefulWidget {
   Function _childBuilder;
 
-  AuthenticationWrapper({@required Function builder}) {this._childBuilder = builder;}
+  AuthenticationWrapper({@required Function builder}) {
+    this._childBuilder = builder;
+  }
 
   @override
   State<StatefulWidget> createState() => AuthenticationWrapperState(this._childBuilder);
 }
 
 class AuthenticationWrapperState extends State<AuthenticationWrapper> {
-  final Function _childBuilder ;
+  final Function _childBuilder;
+
   FirebaseUser _currentUser;
 
   FirebaseUser get currentUser => _currentUser;

@@ -1,13 +1,10 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../tea_session_controller.dart';
 
 abstract class BrewProfileForm extends StatefulWidget {}
 
@@ -85,9 +82,7 @@ class BrewProfileFormState extends State<BrewProfileForm> {
               } else if (value == BrewProfile.getDefault().name) {
                 return 'The name ${value} is reserved for the app-generated default';
               } else if (!this.editExisting &&
-                  _tea.brewProfiles
-                      .where((brewProfile) => brewProfile.name == value)
-                      .length > 0) {
+                  _tea.brewProfiles.where((brewProfile) => brewProfile.name == value).length > 0) {
                 return 'A brew profile named $value already exists for this tea';
               }
 
@@ -150,13 +145,11 @@ class BrewProfileFormState extends State<BrewProfileForm> {
             },
             onSaved: (value) {
               setState(() {
-                final timingsList = value
-                    .trim()
-                    .length > 0
+                final timingsList = value.trim().length > 0
                     ? value.replaceAll(' ', '').split(',').map((str) => max(int.parse(str), 0)).toList()
                     : [
-                  0,
-                ];
+                        0,
+                      ];
                 _steepTimings = timingsList;
               });
             },

@@ -1,16 +1,16 @@
 import 'dart:collection';
 
+import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teavault/services/auth.dart';
-import 'package:teavault/models/tea_production.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:async/async.dart';
+import 'package:teavault/models/tea_production.dart';
+import 'package:teavault/services/auth.dart';
 
 class TeaProductionCollectionModel extends ChangeNotifier {
-
   //Singleton class to allow global access
-  static final TeaProductionCollectionModel _teaProductionCollectionModel = new TeaProductionCollectionModel._internal();
+  static final TeaProductionCollectionModel _teaProductionCollectionModel =
+      new TeaProductionCollectionModel._internal();
 
   factory TeaProductionCollectionModel() {
     return _teaProductionCollectionModel;
@@ -48,20 +48,25 @@ class TeaProductionCollectionModel extends ChangeNotifier {
       _subscribedToDbChanges = true;
       print('Subscribing to TeaProduction updates using profile id ${authService.lastKnownUserProfileId}');
 
-      final globalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
-          'submitted_by_user_with_profile_id', isNull: true).snapshots();
+      final globalUpdateStream = Firestore.instance
+          .collection(dbCollectionName)
+          .where('submitted_by_user_with_profile_id', isNull: true)
+          .snapshots();
       Stream updateStream;
 
       if (authService.lastKnownUserProfileId != null) {
-        final personalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
-            'submitted_by_user_with_profile_id', isEqualTo: authService.lastKnownUserProfileId).snapshots();
+        final personalUpdateStream = Firestore.instance
+            .collection(dbCollectionName)
+            .where('submitted_by_user_with_profile_id', isEqualTo: authService.lastKnownUserProfileId)
+            .snapshots();
         updateStream = StreamGroup.merge([globalUpdateStream, personalUpdateStream]);
       } else {
         updateStream = globalUpdateStream;
       }
 
       updateStream.listen((querySnapshot) {
-        print('Got change to TeaProductions: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
+        print(
+            'Got change to TeaProductions: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
         querySnapshot.documentChanges.forEach((documentChange) {
           final document = documentChange.document;
           if (documentChange.type == DocumentChangeType.removed) {

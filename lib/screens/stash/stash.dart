@@ -23,7 +23,8 @@ class StashView extends StatelessWidget {
         );
 
     return Consumer<TeaCollectionModel>(
-        builder: (context, teaCollection, child) => Column(children: [stashListWidget(teaCollection), getAddTeaListItem(context)]));
+        builder: (context, teaCollection, child) =>
+            Column(children: [stashListWidget(teaCollection), getAddTeaListItem(context)]));
   }
 }
 

@@ -90,7 +90,8 @@ class TeaCollectionModel extends ChangeNotifier {
       final updateStream = user.reference.collection(dbCollectionName).snapshots();
 
       updateStream.listen((querySnapshot) {
-        print('Got changes to TeasInStash: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
+        print(
+            'Got changes to TeasInStash: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
         querySnapshot.documentChanges.forEach((documentChange) {
           final document = documentChange.document;
           if (documentChange.type == DocumentChangeType.removed) {

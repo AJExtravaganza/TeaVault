@@ -7,6 +7,7 @@ class TeaProduction {
   String name;
   int nominalWeightGrams;
   String _producerId;
+
   TeaProducer get producer => teaProducersCollection.getById(this._producerId);
   int productionYear;
 
@@ -30,7 +31,7 @@ class TeaProduction {
 
   static TeaProduction fromDocumentSnapshot(DocumentSnapshot productionDocument) {
     final data = productionDocument.data;
-    return TeaProduction(data['name'], data['nominal_weight_grams'], data['producer'],
-        data['production_year'], productionDocument.documentID);
+    return TeaProduction(data['name'], data['nominal_weight_grams'], data['producer'], data['production_year'],
+        productionDocument.documentID);
   }
 }

@@ -1,11 +1,10 @@
-import 'package:teavault/models/brew_profile.dart';
-import 'package:teavault/tea_session_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:teavault/models/brew_profile.dart';
+import 'package:teavault/tea_session_controller.dart';
 
 class SteepTimer extends StatelessWidget {
-
   final TeaSessionController controller;
 
   SteepTimer(this.controller);
@@ -17,7 +16,6 @@ class SteepTimer extends StatelessWidget {
     );
   }
 }
-
 
 class TimerDisplayRow extends StatelessWidget {
   final TeaSessionController controller;
@@ -50,7 +48,6 @@ class TimerDisplayRow extends StatelessWidget {
   }
 }
 
-
 class TimerDisplay extends StatelessWidget {
   final TeaSessionController controller;
 
@@ -59,11 +56,7 @@ class TimerDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mainContext = context;
-    String currentValueStr = controller.timeRemaining
-        .toString()
-        .split('.')
-        .first
-        .substring(2);
+    String currentValueStr = controller.timeRemaining.toString().split('.').first.substring(2);
 
     Text timerTextContent;
     if (controller.timeRemaining.inSeconds == 0 && !controller.finished) {
@@ -100,7 +93,6 @@ class TimerDisplay extends StatelessWidget {
   }
 }
 
-
 class TimerPickerSheetContents extends StatefulWidget {
   final TeaSessionController controller;
   final BuildContext mainContext;
@@ -123,15 +115,12 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
   Widget build(BuildContext context) {
     _selectedValueInSeconds = controller.currentBrewProfile.steepTimings[controller.currentSteep];
     ;
-    final orientation = MediaQuery
-        .of(context)
-        .orientation;
+    final orientation = MediaQuery.of(context).orientation;
     final portrait = Orientation.portrait;
     int buttonFlex = orientation == portrait ? 15 : 20;
     int timerPickerFlex = orientation == portrait ? 50 : 40;
 
-    bool showSaveButton = (controller.currentTea != null
-        && controller.currentBrewProfile != BrewProfile.getDefault());
+    bool showSaveButton = (controller.currentTea != null && controller.currentBrewProfile != BrewProfile.getDefault());
 
     return Container(
         height: 200,
@@ -147,9 +136,7 @@ class TimerPickerSheetContentsState extends State<TimerPickerSheetContents> {
               children: <Widget>[
                 Expanded(
                   flex: buttonFlex,
-                  child: showSaveButton
-                      ? TimerPickerSaveButton(controller)
-                      : Container(),
+                  child: showSaveButton ? TimerPickerSaveButton(controller) : Container(),
                 ),
                 Expanded(
                   flex: timerPickerFlex,
@@ -176,10 +163,8 @@ class TimerPickerSaveButton extends StatelessWidget {
       onPressed: () async {
         this.controller.timeRemaining = Duration(seconds: state._selectedValueInSeconds);
         Navigator.pop(context);
-        Scaffold.of(state.mainContext)
-            .showSnackBar(SnackBar(content: Text("Saving change to brew profile...")));
-        await controller.saveSteepTimeToBrewProfile(
-            controller.currentSteep, state._selectedValueInSeconds);
+        Scaffold.of(state.mainContext).showSnackBar(SnackBar(content: Text("Saving change to brew profile...")));
+        await controller.saveSteepTimeToBrewProfile(controller.currentSteep, state._selectedValueInSeconds);
       },
       icon: Icon(Icons.save_alt),
       iconSize: 48,

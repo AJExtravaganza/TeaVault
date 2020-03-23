@@ -1,5 +1,5 @@
-import 'package:teavault/screens/authentication/authentication_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:teavault/screens/authentication/authentication_wrapper.dart';
 
 class SignIn extends StatefulWidget {
   @override

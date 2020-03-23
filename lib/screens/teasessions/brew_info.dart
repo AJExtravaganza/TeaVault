@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea.dart';
-import 'package:teavault/screens/stash/brew_profiles_screen.dart';
-import 'package:teavault/screens/stash/stash.dart';
-import 'package:teavault/screens/teasessions/steep_timer.dart';
-import 'package:teavault/tea_session_controller.dart';
 
 import 'helper_functions.dart';
 
@@ -62,10 +57,10 @@ class TeaNameRow extends StatelessWidget {
           Expanded(
               child: Center(
                   child: Text(
-                    this.tea.asString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30),
-                  )))
+            this.tea.asString(),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 30),
+          )))
         ],
       ),
     );
@@ -150,8 +145,8 @@ class BrewProfileNameRow extends StatelessWidget {
     return Row(children: <Widget>[
       Expanded(
           child: Center(
-            child: Text('Brew Profile: ${brewProfile == BrewProfile.getDefault() ? "Default" : brewProfile.name}'),
-          ))
+        child: Text('Brew Profile: ${brewProfile == BrewProfile.getDefault() ? "Default" : brewProfile.name}'),
+      ))
     ]);
   }
 }

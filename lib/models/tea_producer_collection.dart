@@ -2,9 +2,9 @@ import 'dart:collection';
 
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:teavault/models/tea_producer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:teavault/models/tea_producer.dart';
 import 'package:teavault/services/auth.dart';
 
 class TeaProducerCollectionModel extends ChangeNotifier {
@@ -16,7 +16,6 @@ class TeaProducerCollectionModel extends ChangeNotifier {
   }
 
   TeaProducerCollectionModel._internal();
-
 
   final String dbCollectionName = 'tea_producers';
   final Map<String, TeaProducer> _items = {};
@@ -54,20 +53,25 @@ class TeaProducerCollectionModel extends ChangeNotifier {
       _subscribedToDbChanges = true;
       print('Subscribing to TeaProducer updates using profile id ${authService.lastKnownUserProfileId}');
 
-      final globalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
-          'submitted_by_user_with_profile_id', isNull: true).snapshots();
+      final globalUpdateStream = Firestore.instance
+          .collection(dbCollectionName)
+          .where('submitted_by_user_with_profile_id', isNull: true)
+          .snapshots();
       Stream updateStream;
 
       if (authService.lastKnownUserProfileId != null) {
-        final personalUpdateStream = Firestore.instance.collection(dbCollectionName).where(
-            'submitted_by_user_with_profile_id', isEqualTo: authService.lastKnownUserProfileId).snapshots();
+        final personalUpdateStream = Firestore.instance
+            .collection(dbCollectionName)
+            .where('submitted_by_user_with_profile_id', isEqualTo: authService.lastKnownUserProfileId)
+            .snapshots();
         updateStream = StreamGroup.merge([globalUpdateStream, personalUpdateStream]);
       } else {
         updateStream = globalUpdateStream;
       }
 
       updateStream.listen((querySnapshot) {
-        print('Got changes to TeaProducers: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
+        print(
+            'Got changes to TeaProducers: ${querySnapshot.documentChanges.map((change) => change.document.documentID).toList().join(',')}');
         querySnapshot.documentChanges.forEach((documentChange) {
           final document = documentChange.document;
           if (documentChange.type == DocumentChangeType.removed) {

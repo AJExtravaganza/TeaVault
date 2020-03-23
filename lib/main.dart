@@ -2,22 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea_collection.dart';
-import 'package:teavault/models/tea_producer.dart';
 import 'package:teavault/models/tea_producer_collection.dart';
-import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
 import 'package:teavault/models/teapot_collection.dart';
-import 'package:teavault/models/user.dart';
 import 'package:teavault/screens/authentication/authentication_wrapper.dart';
 import 'package:teavault/screens/climate/climate.dart' as climate;
 import 'package:teavault/screens/stash/stash.dart';
 import 'package:teavault/screens/teasessions/tea_session_view.dart';
 import 'package:teavault/tea_session_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   //This is necessary to allow subscription to the db snapshots prior to calling runApp()
@@ -33,22 +29,24 @@ void main() {
 
   runApp(MaterialApp(
       title: 'TeaVault',
-      home: AuthenticationWrapper(builder: () => MultiProvider(
-        providers: [
-          ChangeNotifierProvider<TeaProducerCollectionModel>(
-            create: (_) => teaProducersCollection,
-          ),
-          ChangeNotifierProvider<TeaProductionCollectionModel>(
-            create: (_) => teaProductionsCollection,
-          ),
-          ChangeNotifierProvider<TeaCollectionModel>(
-            create: (_) => teasCollection,
-          ),
-          ChangeNotifierProvider<TeapotCollectionModel>(create: (_) => TeapotCollectionModel(userTeapotCollection)),
-          ChangeNotifierProvider<TeaSessionController>(create: (_) => TeaSessionController(teasCollection)),
-        ],
-        child: MyApp(onBuild: subscribeModels),
-      ))));
+      home: AuthenticationWrapper(
+          builder: () => MultiProvider(
+                providers: [
+                  ChangeNotifierProvider<TeaProducerCollectionModel>(
+                    create: (_) => teaProducersCollection,
+                  ),
+                  ChangeNotifierProvider<TeaProductionCollectionModel>(
+                    create: (_) => teaProductionsCollection,
+                  ),
+                  ChangeNotifierProvider<TeaCollectionModel>(
+                    create: (_) => teasCollection,
+                  ),
+                  ChangeNotifierProvider<TeapotCollectionModel>(
+                      create: (_) => TeapotCollectionModel(userTeapotCollection)),
+                  ChangeNotifierProvider<TeaSessionController>(create: (_) => TeaSessionController(teasCollection)),
+                ],
+                child: MyApp(onBuild: subscribeModels),
+              ))));
 }
 
 class MyApp extends StatelessWidget {

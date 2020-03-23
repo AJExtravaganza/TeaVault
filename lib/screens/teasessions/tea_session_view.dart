@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:teavault/screens/stash/brew_profiles_screen.dart';
-import 'package:teavault/screens/stash/stash.dart';
 import 'package:teavault/screens/teasessions/steep_timer.dart';
 import 'package:teavault/tea_session_controller.dart';
 

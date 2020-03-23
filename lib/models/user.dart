@@ -8,8 +8,10 @@ Future<DocumentSnapshot> fetchUserProfile() async {
   }
 
   try {
-    final userDbRecordSet =
-    await Firestore.instance.collection('users').where('uid', isEqualTo: authService.lastKnownUser.uid).getDocuments();
+    final userDbRecordSet = await Firestore.instance
+        .collection('users')
+        .where('uid', isEqualTo: authService.lastKnownUser.uid)
+        .getDocuments();
     if (userDbRecordSet.documents.length > 1) {
       throw RangeError('Duplicate documents exist for user ${authService.lastKnownUser.uid} in the users collection');
     }

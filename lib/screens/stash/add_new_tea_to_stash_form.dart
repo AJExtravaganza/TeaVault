@@ -1,14 +1,12 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
 import 'package:teavault/models/tea_producer.dart';
 import 'package:teavault/models/tea_producer_collection.dart';
 import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../tea_session_controller.dart';
 
 class AddNewTeaToStash extends StatelessWidget {
   @override
@@ -82,31 +80,35 @@ class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
     return Form(
       key: _formKey,
       child: new ListView(children: <Widget>[
-        Consumer<TeaProducerCollectionModel>(builder: (context, producers, child) => DropdownButtonFormField(
-          hint: Text('Select Producer'),
-          items: getProducerDropdownList(producers),
-          value: _producer,
-          onChanged: (value) {
-            setState(() {
-              _producer = value;
-              if (_production != null && _production.producer != _producer) {
-                _production = null;
-              }
-            });
-          },
-          isExpanded: true,
-        ),),
-        Consumer<TeaProductionCollectionModel>(builder: (context, productions, child) => DropdownButtonFormField(
-            hint: Text('Select Production'),
-            items: getProductionDropdownList(productions),
-            value: _production,
+        Consumer<TeaProducerCollectionModel>(
+          builder: (context, producers, child) => DropdownButtonFormField(
+            hint: Text('Select Producer'),
+            items: getProducerDropdownList(producers),
+            value: _producer,
             onChanged: (value) {
               setState(() {
-                _production = value;
-                _producer = _production.producer;
+                _producer = value;
+                if (_production != null && _production.producer != _producer) {
+                  _production = null;
+                }
               });
             },
-            isExpanded: true),),
+            isExpanded: true,
+          ),
+        ),
+        Consumer<TeaProductionCollectionModel>(
+          builder: (context, productions, child) => DropdownButtonFormField(
+              hint: Text('Select Production'),
+              items: getProductionDropdownList(productions),
+              value: _production,
+              onChanged: (value) {
+                setState(() {
+                  _production = value;
+                  _producer = _production.producer;
+                });
+              },
+              isExpanded: true),
+        ),
         TextFormField(
             decoration: InputDecoration(labelText: 'Enter Quantity', hintText: 'Quantity'),
             validator: (value) {

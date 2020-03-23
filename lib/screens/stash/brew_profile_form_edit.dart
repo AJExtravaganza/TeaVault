@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
@@ -38,5 +36,5 @@ class _BrewProfileEditFormState extends BrewProfileFormState {
 
   _BrewProfileEditFormState(Tea tea, BrewProfile brewProfile)
       : super(tea, brewProfile.name, brewProfile.nominalRatio, brewProfile.brewTemperatureCelsius,
-      brewProfile.steepTimings);
+            brewProfile.steepTimings);
 }

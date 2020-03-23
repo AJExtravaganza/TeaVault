@@ -1,7 +1,7 @@
 import 'dart:collection';
 
-import 'package:teavault/models/brewing_vessel.dart';
 import 'package:flutter/widgets.dart';
+import 'package:teavault/models/brewing_vessel.dart';
 
 class TeapotCollectionModel extends ChangeNotifier {
   final List<BrewingVessel> _items;

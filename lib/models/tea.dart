@@ -1,9 +1,8 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teavault/models/brew_profile.dart';
+import 'package:teavault/models/tea_collection.dart';
 import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
-import 'package:teavault/models/tea_collection.dart';
 
 enum TeaFormFactor { cake, brick, tuo, mushroomtuo, looseleaf }
 
@@ -11,6 +10,7 @@ class Tea {
   String _id;
   int quantity;
   String _productionId;
+
   TeaProduction get production => teaProductionsCollection.getById(_productionId);
   List<BrewProfile> brewProfiles = [];
 
@@ -43,15 +43,14 @@ class Tea {
       this.brewProfiles = [];
     }
   }
-  
+
   static Tea copyFrom(Tea tea) {
     return new Tea(tea.quantity, tea._productionId, tea.brewProfiles);
   }
 
   static Tea fromDocumentSnapshot(DocumentSnapshot producerDocument) {
     final data = producerDocument.data;
-    List<BrewProfile> brewProfiles =
-    List.from(data['brew_profiles'].map((json) => BrewProfile.fromJson(json)));
+    List<BrewProfile> brewProfiles = List.from(data['brew_profiles'].map((json) => BrewProfile.fromJson(json)));
     return Tea(data['quantity'], data['production'], brewProfiles);
   }
 

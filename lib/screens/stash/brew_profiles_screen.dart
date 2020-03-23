@@ -103,7 +103,6 @@ class BrewProfilesListItem extends StatelessWidget {
 }
 
 class BrewProfilesListView extends Consumer<TeaCollectionModel> {
-
   BrewProfilesListView(tea, {suppressTileMenu: false})
       : super(builder: (context, teas, child) {
           tea = teas.getUpdated(tea);

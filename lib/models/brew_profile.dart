@@ -11,6 +11,7 @@ class BrewProfile {
   List<int> get trimmedSteepTimings => _trimSteepTimingsList(steepTimings);
 
   String get name => this._name == _DEFAULTNAME ? 'Default' : _name;
+
   set name(String newName) {
     if (this == getDefault()) {
       throw Exception('You cannot change the name of the default BrewProfile');
@@ -62,7 +63,7 @@ class BrewProfile {
   }
 
   @override
-  bool operator ==(other) =>  other.name == this.name;
+  bool operator ==(other) => other.name == this.name;
 
   static int compare(a, b) {
     if (a.isFavorite && !b.isFavorite) {
