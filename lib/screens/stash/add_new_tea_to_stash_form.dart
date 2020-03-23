@@ -20,17 +20,69 @@ class AddNewTeaToStash extends StatelessWidget {
   }
 }
 
-class StashAddNewTeaForm extends StatefulWidget {
+class CommonOrCustomNewTeaSelectionScreen extends StatelessWidget {
   @override
-  _StashAddNewTeaFormState createState() => new _StashAddNewTeaFormState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Existing or Custom Production?'),
+        ),
+        body: Column(children: <Widget>[
+          RaisedButton(
+            child: Text('Choose Existing Production'),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => StashAddNewTeaForm(userDefined: false)));
+            },
+          ),
+          RaisedButton(
+              child: Text('Define Custom Production'),
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => StashAddNewTeaForm(userDefined: true)));
+              })
+        ]));
+  }
 }
 
-class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
+class StashAddNewTeaForm extends StatefulWidget {
+  final bool userDefined;
+  
+  StashAddNewTeaForm({this.userDefined: false});
+  
+  @override
+  StashAddNewTeaFormState createState() => new StashAddNewTeaFormState(userDefined: this.userDefined);
+}
+
+class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
+  final bool userDefined; 
   final _formKey = GlobalKey<FormState>();
 
   TeaProducer _producer;
   TeaProduction _production;
   int _quantity;
+  
+  StashAddNewTeaFormState({this.userDefined: false});
+
+  TeaProducer get producer => this._producer;
+  
+  set producer(TeaProducer producer) {
+    setState(() {
+      setState(() {
+        _producer = producer;
+        if (_production != null && _production.producer != _producer) {
+          _production = null;
+        }
+      });
+    });
+  }
+  
+  TeaProduction get production => this._production;
+  
+  set production (TeaProduction production) {
+    this._producer = production.producer;
+    this._production = production;
+  }
 
   //  Necessary for TextFormField select-all-on-focus
   static final _quantityInitialValue = '1';
@@ -56,59 +108,13 @@ class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
     super.dispose();
   }
 
-  List<DropdownMenuItem<TeaProducer>> getProducerDropdownList(TeaProducerCollectionModel producers) {
-    return producers.items
-        .map((producer) => DropdownMenuItem(
-              child: Text(producer.asString()),
-              value: producer,
-            ))
-        .toList();
-  }
-
-  List<DropdownMenuItem<TeaProduction>> getProductionDropdownList(TeaProductionCollectionModel productions) {
-    return productions.items
-        .map((production) => DropdownMenuItem(
-              child: Text(production.asString()),
-              value: production,
-            ))
-        .where((dropdownListItem) => (_producer == null || dropdownListItem.value.producer == _producer))
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: new ListView(children: <Widget>[
-        Consumer<TeaProducerCollectionModel>(
-          builder: (context, producers, child) => DropdownButtonFormField(
-            hint: Text('Select Producer'),
-            items: getProducerDropdownList(producers),
-            value: _producer,
-            onChanged: (value) {
-              setState(() {
-                _producer = value;
-                if (_production != null && _production.producer != _producer) {
-                  _production = null;
-                }
-              });
-            },
-            isExpanded: true,
-          ),
-        ),
-        Consumer<TeaProductionCollectionModel>(
-          builder: (context, productions, child) => DropdownButtonFormField(
-              hint: Text('Select Production'),
-              items: getProductionDropdownList(productions),
-              value: _production,
-              onChanged: (value) {
-                setState(() {
-                  _production = value;
-                  _producer = _production.producer;
-                });
-              },
-              isExpanded: true),
-        ),
+        this.userDefined ? Text('Placeholder') : ProducerDropdown(this),
+        this.userDefined ? Text('Placeholder'): ProductionDropdown(this),
         TextFormField(
             decoration: InputDecoration(labelText: 'Enter Quantity', hintText: 'Quantity'),
             validator: (value) {
@@ -144,5 +150,56 @@ class _StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       await teasCollection.add(Tea(_quantity, _production.id));
       Navigator.pop(context);
     }
+  }
+}
+
+class ProducerDropdown extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  ProducerDropdown(this.state);
+
+  @override
+  Widget build(BuildContext context,) {
+    final listItems = teaProducersCollection.items
+        .map((producer) => DropdownMenuItem(
+              child: Text(producer.asString()),
+              value: producer,
+            ))
+        .toList();
+    return DropdownButtonFormField(
+      hint: Text('Select Producer'),
+      items: listItems,
+      value: state.producer,
+      onChanged: (value) {state.producer = value;},
+      isExpanded: true,
+    );
+  }
+}
+
+class ProductionDropdown extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+  
+  ProductionDropdown(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    final listItems = teaProductionsCollection.items
+        .map((production) => DropdownMenuItem(
+      child: Text(production.asString()),
+      value: production,
+    ))
+        .where((dropdownListItem) => (state.producer == null || dropdownListItem.value.producer == state.producer))
+        .toList();
+    return Consumer<TeaProductionCollectionModel>(
+      builder: (context, productions, child) => DropdownButtonFormField(
+          hint: Text('Select Production'),
+          value: state.production,
+          items: listItems,
+          onChanged: (value) {
+            state.production = value;
+            state.producer = value.producer;
+          },
+          isExpanded: true),
+    );
   }
 }
