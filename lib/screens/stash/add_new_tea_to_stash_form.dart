@@ -51,37 +51,65 @@ class StashAddNewTeaForm extends StatefulWidget {
   StashAddNewTeaForm({this.userDefined: false});
 
   @override
-  StashAddNewTeaFormState createState() => new StashAddNewTeaFormState(userDefined: this.userDefined);
+  StashAddNewTeaFormState createState() => new StashAddNewTeaFormState(this.userDefined);
 }
 
 class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
-  final bool userDefined;
+  static final TeaProducer userDefinedReservedProducerValue = TeaProducer('userDefinedReservedListValue', '');
+  static final TeaProduction userDefinedReservedProductionValue =
+      TeaProduction('userDefinedReservedListValue', 0, '', 0);
+
+  bool _userDefinedProducer = false;
+  bool _userDefinedProduction = false;
+
+  get userDefinedProducer => _userDefinedProducer;
+  get userDefinedProduction => _userDefinedProduction;
+
+  set userDefined(value) {
+    setState(() {
+      _userDefinedProducer = value;
+      _userDefinedProduction = value;
+    });
+  }
+
+  set userDefinedProduction(value) {
+    setState(() {
+      _userDefinedProduction = value;
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   TeaProducer _producer;
   TeaProduction _production;
   int _quantity;
 
-  StashAddNewTeaFormState({this.userDefined: false});
+  StashAddNewTeaFormState([userDefined]) {
+    this._userDefinedProducer = userDefined;
+    this._userDefinedProduction = userDefined;
+  }
 
   TeaProducer get producer => this._producer;
 
   set producer(TeaProducer producer) {
     setState(() {
-      setState(() {
-        _producer = producer;
-        if (_production != null && _production.producer != _producer) {
-          _production = null;
-        }
-      });
+      _producer = producer;
+      if (_production != null && _production.producer != _producer) {
+        _production = null;
+      }
     });
   }
 
   TeaProduction get production => this._production;
 
   set production(TeaProduction production) {
-    this._producer = production.producer;
-    this._production = production;
+    setState(() {
+      if (production != userDefinedReservedProductionValue) {
+        this._producer = production.producer;
+      }
+
+      this._production = production;
+    });
   }
 
   int get quantity => _quantity;
@@ -125,8 +153,8 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
     return Form(
       key: _formKey,
       child: new ListView(children: <Widget>[
-        this.userDefined ? Text('Placeholder') : ProducerDropdown(this),
-        this.userDefined ? Text('Placeholder') : ProductionDropdown(this),
+        this.userDefinedProducer ? Text('Placeholder') : ProducerDropdown(this),
+        this.userDefinedProduction ? Text('Placeholder') : ProductionDropdown(this),
         QuantityField(this),
         SubmitButton(this),
       ]),
@@ -153,12 +181,20 @@ class ProducerDropdown extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) {
-    final listItems = teaProducersCollection.items
-        .map((producer) => DropdownMenuItem(
-              child: Text(producer.asString()),
-              value: producer,
-            ))
-        .toList();
+    final userSubmissionListItem = DropdownMenuItem(
+      child: Text('Create Producer'),
+      value: StashAddNewTeaFormState.userDefinedReservedProducerValue,
+    );
+
+    final listItems = [
+          userSubmissionListItem,
+        ] +
+        teaProducersCollection.items
+            .map((producer) => DropdownMenuItem(
+                  child: Text(producer.asString()),
+                  value: producer,
+                ))
+            .toList();
     return DropdownButtonFormField(
       hint: Text('Select Producer'),
       items: listItems,
@@ -171,7 +207,11 @@ class ProducerDropdown extends StatelessWidget {
         return null;
       },
       onChanged: (value) {
-        state.producer = value;
+        if (value == StashAddNewTeaFormState.userDefinedReservedProducerValue) {
+          state.userDefined = true;
+        } else {
+          state.producer = value;
+        }
       },
       isExpanded: true,
     );
@@ -185,7 +225,12 @@ class ProductionDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final listItems = teaProductionsCollection.items
+    final userSubmissionListItem = DropdownMenuItem(
+      child: Text('Create Production'),
+      value: StashAddNewTeaFormState.userDefinedReservedProductionValue,
+    );
+
+    final listItems = [userSubmissionListItem,] + teaProductionsCollection.items
         .map((production) => DropdownMenuItem(
               child: Text(production.asString()),
               value: production,
@@ -205,8 +250,11 @@ class ProductionDropdown extends StatelessWidget {
           },
           items: listItems,
           onChanged: (value) {
-            state.production = value;
-            state.producer = value.producer;
+            if (value == StashAddNewTeaFormState.userDefinedReservedProductionValue) {
+              state.userDefinedProduction = true;
+            } else {
+              state.production = value;
+            }
           },
           isExpanded: true),
     );
