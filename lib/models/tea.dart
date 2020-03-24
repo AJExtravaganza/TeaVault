@@ -72,8 +72,9 @@ class Tea {
     this.brewProfiles.forEach((existingBrewProfile) {
       existingBrewProfile.isFavorite = false;
     });
-    brewProfile.isFavorite = true;
 
+    brewProfile.isFavorite = true;
+    sortBrewProfiles();
     await teasCollection.push(this);
   }
 
@@ -82,8 +83,14 @@ class Tea {
     if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
       newBrewProfiles.first.isFavorite = true;
     }
+
     this.brewProfiles = newBrewProfiles;
+    sortBrewProfiles();
     await teasCollection.push(this);
+  }
+
+  void sortBrewProfiles() {
+    this.brewProfiles.sort(BrewProfile.compare);
   }
 
   bool operator ==(dynamic other) {
