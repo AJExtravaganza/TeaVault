@@ -47,25 +47,25 @@ class CommonOrCustomNewTeaSelectionScreen extends StatelessWidget {
 
 class StashAddNewTeaForm extends StatefulWidget {
   final bool userDefined;
-  
+
   StashAddNewTeaForm({this.userDefined: false});
-  
+
   @override
   StashAddNewTeaFormState createState() => new StashAddNewTeaFormState(userDefined: this.userDefined);
 }
 
 class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
-  final bool userDefined; 
+  final bool userDefined;
   final _formKey = GlobalKey<FormState>();
 
   TeaProducer _producer;
   TeaProduction _production;
   int _quantity;
-  
+
   StashAddNewTeaFormState({this.userDefined: false});
 
   TeaProducer get producer => this._producer;
-  
+
   set producer(TeaProducer producer) {
     setState(() {
       setState(() {
@@ -76,18 +76,30 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       });
     });
   }
-  
+
   TeaProduction get production => this._production;
-  
-  set production (TeaProduction production) {
+
+  set production(TeaProduction production) {
     this._producer = production.producer;
     this._production = production;
+  }
+
+  int get quantity => _quantity;
+
+  set quantity(int value) {
+    setState(() {
+      _quantity = value;
+    });
   }
 
   //  Necessary for TextFormField select-all-on-focus
   static final _quantityInitialValue = '1';
   final _quantityFieldController = TextEditingController(text: _quantityInitialValue);
   FocusNode _quantityFieldFocusNode;
+
+  get quantityFieldController => _quantityFieldController;
+
+  get quantityFieldFocusNode => _quantityFieldFocusNode;
 
   @override
   initState() {
@@ -114,35 +126,14 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       key: _formKey,
       child: new ListView(children: <Widget>[
         this.userDefined ? Text('Placeholder') : ProducerDropdown(this),
-        this.userDefined ? Text('Placeholder'): ProductionDropdown(this),
-        TextFormField(
-            decoration: InputDecoration(labelText: 'Enter Quantity', hintText: 'Quantity'),
-            validator: (value) {
-              if (int.tryParse(value) == null) {
-                return 'Please enter a valid quantity';
-              }
-              return null;
-            },
-            focusNode: _quantityFieldFocusNode,
-            controller: _quantityFieldController,
-            onSaved: (value) {
-              setState(() {
-                _quantity = int.parse(value);
-              });
-            },
-            keyboardType: TextInputType.number),
-        RaisedButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            child: new Text('Add to Stash'),
-            onPressed: () async {
-              await addNewTeaFormSubmit();
-            })
+        this.userDefined ? Text('Placeholder') : ProductionDropdown(this),
+        QuantityField(this),
+        SubmitButton(this),
       ]),
     );
   }
 
-  void addNewTeaFormSubmit() async {
+  Future addNewTeaFormSubmit() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       FocusScope.of(context).unfocus(); //Dismiss the keyboard
@@ -159,7 +150,9 @@ class ProducerDropdown extends StatelessWidget {
   ProducerDropdown(this.state);
 
   @override
-  Widget build(BuildContext context,) {
+  Widget build(
+    BuildContext context,
+  ) {
     final listItems = teaProducersCollection.items
         .map((producer) => DropdownMenuItem(
               child: Text(producer.asString()),
@@ -170,7 +163,16 @@ class ProducerDropdown extends StatelessWidget {
       hint: Text('Select Producer'),
       items: listItems,
       value: state.producer,
-      onChanged: (value) {state.producer = value;},
+      validator: (value) {
+        if (value == null) {
+          return 'You must select a producer.';
+        }
+
+        return null;
+      },
+      onChanged: (value) {
+        state.producer = value;
+      },
       isExpanded: true,
     );
   }
@@ -178,22 +180,29 @@ class ProducerDropdown extends StatelessWidget {
 
 class ProductionDropdown extends StatelessWidget {
   final StashAddNewTeaFormState state;
-  
+
   ProductionDropdown(this.state);
 
   @override
   Widget build(BuildContext context) {
     final listItems = teaProductionsCollection.items
         .map((production) => DropdownMenuItem(
-      child: Text(production.asString()),
-      value: production,
-    ))
+              child: Text(production.asString()),
+              value: production,
+            ))
         .where((dropdownListItem) => (state.producer == null || dropdownListItem.value.producer == state.producer))
         .toList();
     return Consumer<TeaProductionCollectionModel>(
       builder: (context, productions, child) => DropdownButtonFormField(
           hint: Text('Select Production'),
           value: state.production,
+          validator: (value) {
+            if (value == null) {
+              return 'You must select a production.';
+            }
+
+            return null;
+          },
           items: listItems,
           onChanged: (value) {
             state.production = value;
@@ -201,5 +210,46 @@ class ProductionDropdown extends StatelessWidget {
           },
           isExpanded: true),
     );
+  }
+}
+
+class QuantityField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  QuantityField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Quantity', hintText: 'Quantity'),
+        validator: (value) {
+          if (int.tryParse(value) == null) {
+            return 'Please enter a valid quantity';
+          }
+          return null;
+        },
+        focusNode: state.quantityFieldFocusNode,
+        controller: state.quantityFieldController,
+        onSaved: (value) {
+          state.quantity = int.parse(value);
+        },
+        keyboardType: TextInputType.number);
+  }
+}
+
+class SubmitButton extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  SubmitButton(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+        color: Colors.blue,
+        textColor: Colors.white,
+        child: new Text('Add to Stash'),
+        onPressed: () async {
+          await state.addNewTeaFormSubmit();
+        });
   }
 }
