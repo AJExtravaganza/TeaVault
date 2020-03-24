@@ -72,7 +72,12 @@ class TeaProductionCollectionModel extends ChangeNotifier {
           if (documentChange.type == DocumentChangeType.removed) {
             this._items.remove(documentChange.document.documentID);
           } else {
-            this._items[document.documentID] = TeaProduction.fromDocumentSnapshot(document);
+            try{
+              final newProduction = TeaProduction.fromDocumentSnapshot(document);
+              this._items[newProduction.id] = newProduction;
+            } on Exception catch (err) {
+              print('Error: $err\nProduction not added to TeaProductionsCollection');
+            }
           }
           notifyListeners();
         });

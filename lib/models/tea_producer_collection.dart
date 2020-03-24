@@ -38,7 +38,7 @@ class TeaProducerCollectionModel extends ChangeNotifier {
   TeaProducer getByName(String name) => _items.values.singleWhere((producer) => producer.name == name);
 
   Future<DocumentReference> put(TeaProducer producer) async {
-    if (!producer.isCustom) {
+    if (!producer.isUserSubmitted) {
       throw Exception('Users may not modify non-custom producers');
     }
 

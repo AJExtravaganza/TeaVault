@@ -48,10 +48,24 @@ class Tea {
     return new Tea(tea.quantity, tea._productionId, tea.brewProfiles);
   }
 
+  void validate() {
+    if (teaProductionsCollection.getById(_productionId)==null) {
+      throw Exception('No such TeaProduction $_productionId accessible in db by this user');
+    }
+  }
+
   static Tea fromDocumentSnapshot(DocumentSnapshot producerDocument) {
     final data = producerDocument.data;
     List<BrewProfile> brewProfiles = List.from(data['brew_profiles'].map((json) => BrewProfile.fromJson(json)));
-    return Tea(data['quantity'], data['production'], brewProfiles);
+    final newTea = Tea(data['quantity'], data['production'], brewProfiles);
+
+    try {
+      newTea.validate();
+    } catch (err) {
+      throw Exception('Could not validate tea with productionId: ${newTea._productionId}');
+    }
+
+    return newTea;
   }
 
   Future setBrewProfileAsFavorite(BrewProfile brewProfile) async {

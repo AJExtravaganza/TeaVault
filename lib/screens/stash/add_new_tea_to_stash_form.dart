@@ -7,6 +7,7 @@ import 'package:teavault/models/tea_producer.dart';
 import 'package:teavault/models/tea_producer_collection.dart';
 import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
+import 'package:teavault/services/auth.dart';
 
 class AddNewTeaToStash extends StatelessWidget {
   @override
@@ -161,7 +162,7 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       key: _formKey,
       child: new ListView(children: <Widget>[
         this.userDefinedProducer ? Column(children: <Widget>[CreateProducerNameField(this), CreateProducerShortNameField(this)],) : ProducerDropdown(this),
-        this.userDefinedProduction ? Text('Placeholder') : ProductionDropdown(this),
+        this.userDefinedProduction ? Column(children: <Widget>[CreateProductionNameField(this), CreateProductionYearField(this), CreateProductionWeightField(this)],) : ProductionDropdown(this),
         QuantityField(this),
         SubmitButton(this),
       ]),
@@ -175,13 +176,13 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Adding new tea to stash...')));
 
       if (userDefinedProducer) {
-        final newProducer = await teaProducersCollection.put(this.producer);
-        this._production = TeaProduction(_production.name, production.nominalWeightGrams, newProducer.documentID, _production.productionYear);
+        final newProducer = await teaProducersCollection.put(TeaProducer(this.userDefinedProducerName, this.userDefinedProducerShortName, authService.lastKnownUserProfileId));
+        this.producer = teaProducersCollection.getById(newProducer.documentID);
       }
 
       if (userDefinedProduction) {
-        final newProduction = await teaProductionsCollection.put(this.production);
-        this._production.id = newProduction.documentID;
+        final newProduction = await teaProductionsCollection.put(TeaProduction(userDefinedProductionName, userDefinedNominalWeightGrams, this.producer.id, this.userDefinedProductionYear, authService.lastKnownUserProfileId));
+        this._production = teaProductionsCollection.getById(newProduction.documentID);
       }
 
       await teasCollection.add(Tea(_quantity, _production.id));
@@ -253,10 +254,6 @@ class CreateProducerNameField extends StatelessWidget {
         },
         onSaved: (value) {
           state.userDefinedProducerName = value;
-          if (state.userDefinedProducerShortName == null || state.userDefinedProducerShortName.length == 0) {
-            state.userDefinedProducerShortName = value;
-          }
-          state.producer = TeaProducer(state.userDefinedProducerName, state.userDefinedProducerShortName);
         }
     );
   }
@@ -279,7 +276,6 @@ class CreateProducerShortNameField extends StatelessWidget {
         },
         onSaved: (value) {
           state.userDefinedProducerShortName = value;
-          state.producer = TeaProducer(state.userDefinedProducerName, state.userDefinedProducerShortName);
         }
     );
   }
@@ -325,6 +321,72 @@ class ProductionDropdown extends StatelessWidget {
           },
           isExpanded: true),
     );
+  }
+}
+
+class CreateProductionNameField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  CreateProductionNameField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Production Name', hintText: 'Production Name'),
+        validator: (value) {
+          if (value.length == 0) {
+            return 'Please enter a valid name';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          state.userDefinedProductionName = value;
+        }
+    );
+  }
+}
+
+class CreateProductionYearField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  CreateProductionYearField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Production Year', hintText: 'Year of Production'),
+        validator: (value) {
+          if (int.tryParse(value) == null || int.tryParse(value) < 1940 || int.tryParse(value) > DateTime.now().year) {
+            return 'Please enter a valid year between 1940 and ${DateTime.now().year}';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          state.userDefinedProductionYear = int.parse(value);
+        },
+        keyboardType: TextInputType.number);
+  }
+}
+
+class CreateProductionWeightField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  CreateProductionWeightField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Weight', hintText: 'Weight per Unit, in grams'),
+        validator: (value) {
+          if (int.tryParse(value) == null) {
+            return 'Please enter a valid weight in grams';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          state.userDefinedNominalWeightGrams = int.parse(value);
+        },
+        keyboardType: TextInputType.number);
   }
 }
 
