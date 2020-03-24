@@ -59,22 +59,29 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
   static final TeaProduction userDefinedReservedProductionValue =
       TeaProduction('userDefinedReservedListValue', 0, '', 0);
 
-  bool _userDefinedProducer = false;
-  bool _userDefinedProduction = false;
+  bool _producerIsuserDefined = false;
+  bool _productionIsUserDefined = false;
 
-  get userDefinedProducer => _userDefinedProducer;
-  get userDefinedProduction => _userDefinedProduction;
+  String userDefinedProducerName;
+  String userDefinedProducerShortName;
+
+  String userDefinedProductionName;
+  int userDefinedNominalWeightGrams;
+  int userDefinedProductionYear;
+
+  get userDefinedProducer => _producerIsuserDefined;
+  get userDefinedProduction => _productionIsUserDefined;
 
   set userDefined(value) {
     setState(() {
-      _userDefinedProducer = value;
-      _userDefinedProduction = value;
+      _producerIsuserDefined = value;
+      _productionIsUserDefined = value;
     });
   }
 
   set userDefinedProduction(value) {
     setState(() {
-      _userDefinedProduction = value;
+      _productionIsUserDefined = value;
     });
   }
 
@@ -85,8 +92,8 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
   int _quantity;
 
   StashAddNewTeaFormState([userDefined]) {
-    this._userDefinedProducer = userDefined;
-    this._userDefinedProduction = userDefined;
+    this._producerIsuserDefined = userDefined;
+    this._productionIsUserDefined = userDefined;
   }
 
   TeaProducer get producer => this._producer;
@@ -153,7 +160,7 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
     return Form(
       key: _formKey,
       child: new ListView(children: <Widget>[
-        this.userDefinedProducer ? Text('Placeholder') : ProducerDropdown(this),
+        this.userDefinedProducer ? Column(children: <Widget>[CreateProducerNameField(this), CreateProducerShortNameField(this)],) : ProducerDropdown(this),
         this.userDefinedProduction ? Text('Placeholder') : ProductionDropdown(this),
         QuantityField(this),
         SubmitButton(this),
@@ -166,6 +173,17 @@ class StashAddNewTeaFormState extends State<StashAddNewTeaForm> {
       _formKey.currentState.save();
       FocusScope.of(context).unfocus(); //Dismiss the keyboard
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Adding new tea to stash...')));
+
+      if (userDefinedProducer) {
+        final newProducer = await teaProducersCollection.put(this.producer);
+        this._production = TeaProduction(_production.name, production.nominalWeightGrams, newProducer.documentID, _production.productionYear);
+      }
+
+      if (userDefinedProduction) {
+        final newProduction = await teaProductionsCollection.put(this.production);
+        this._production.id = newProduction.documentID;
+      }
+
       await teasCollection.add(Tea(_quantity, _production.id));
       Navigator.pop(context);
     }
@@ -214,6 +232,55 @@ class ProducerDropdown extends StatelessWidget {
         }
       },
       isExpanded: true,
+    );
+  }
+}
+
+class CreateProducerNameField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  CreateProducerNameField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Producer Name', hintText: 'Full Name'),
+        validator: (value) {
+          if (value.length == 0) {
+            return 'Please enter a valid name';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          state.userDefinedProducerName = value;
+          if (state.userDefinedProducerShortName == null || state.userDefinedProducerShortName.length == 0) {
+            state.userDefinedProducerShortName = value;
+          }
+          state.producer = TeaProducer(state.userDefinedProducerName, state.userDefinedProducerShortName);
+        }
+    );
+  }
+}
+
+class CreateProducerShortNameField extends StatelessWidget {
+  final StashAddNewTeaFormState state;
+
+  CreateProducerShortNameField(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        decoration: InputDecoration(labelText: 'Enter Abbreviated Producer Name', hintText: 'Abbreviated Name'),
+        validator: (value) {
+          if (value.length == 0) {
+            return 'Please enter a valid name';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          state.userDefinedProducerShortName = value;
+          state.producer = TeaProducer(state.userDefinedProducerName, state.userDefinedProducerShortName);
+        }
     );
   }
 }
