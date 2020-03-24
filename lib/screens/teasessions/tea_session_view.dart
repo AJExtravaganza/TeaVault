@@ -123,6 +123,7 @@ class InitialTeaSelectButton extends StatelessWidget {
         ),
         color: Colors.white70,
         onPressed: () {
+          onPressDefaultVibrate();
           selectTeaFromStash(context);
         },
         child: Center(

@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:teavault/main.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
-import 'package:teavault/screens/stash/add_new_tea_to_stash_form.dart';
+import 'package:teavault/screens/stash/stash_tea_form.dart';
 import 'package:teavault/screens/stash/brew_profiles_screen.dart';
+import 'package:teavault/screens/stash/stash_tea_form_add.dart';
+import 'package:teavault/screens/stash/stash_tea_form_edit.dart';
+import 'package:teavault/screens/teasessions/helper_functions.dart';
 import 'package:teavault/tea_session_controller.dart';
 
 class StashView extends StatelessWidget {
@@ -37,14 +40,15 @@ StatelessWidget getAddTeaListItem(BuildContext context) {
               child: RaisedButton(
         child: Text("Add New Tea"),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewTeaToStash()));
+          onPressDefaultVibrate();
+          Navigator.push(context, MaterialPageRoute(builder: (context) => StashTeaAdd()));
         },
       )))
     ],
   ));
 }
 
-enum StashTileInteraction { brewProfiles, changeQuantity, remove }
+enum StashTileInteraction { brewProfiles, modifyQuantity, remove }
 
 class StashListItem extends StatelessWidget {
   final Tea tea;
@@ -69,8 +73,8 @@ class StashListItem extends StatelessWidget {
                 onSelected: (StashTileInteraction result) {
                   if (result == StashTileInteraction.brewProfiles) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => BrewProfilesScreen(tea)));
-                  } else if (result == StashTileInteraction.changeQuantity) {
-                    //TODO Implement change quantity
+                  } else if (result == StashTileInteraction.modifyQuantity) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => StashTeaEdit(tea: this.tea,)));
                   } else if (result == StashTileInteraction.remove) {
                     teasCollection.remove(tea);
                   } else {
@@ -83,8 +87,8 @@ class StashListItem extends StatelessWidget {
                     child: Text('Brew Profiles'),
                   ),
                   const PopupMenuItem<StashTileInteraction>(
-                    value: StashTileInteraction.changeQuantity,
-                    child: Text('Change Quantity'),
+                    value: StashTileInteraction.modifyQuantity,
+                    child: Text('Modify Quantity'),
                   ),
                   const PopupMenuItem<StashTileInteraction>(
                     value: StashTileInteraction.remove,
@@ -94,6 +98,7 @@ class StashListItem extends StatelessWidget {
               ),
         isThreeLine: true,
         onTap: () {
+          onPressDefaultVibrate();
           Provider.of<TeaSessionController>(context, listen: false).currentTea = tea;
           if (this._popAfterSelection) {
             Navigator.pop(context);

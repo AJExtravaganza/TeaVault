@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
+import 'package:teavault/screens/teasessions/helper_functions.dart';
 import 'package:teavault/tea_session_controller.dart';
 
 import 'brew_profile_form_add.dart';
@@ -92,6 +93,7 @@ class BrewProfilesListItem extends StatelessWidget {
               ),
         isThreeLine: true,
         onTap: () {
+          onPressDefaultVibrate();
           final teaSessionController = Provider.of<TeaSessionController>(context, listen: false);
           teaSessionController.currentTea = this._tea;
           teaSessionController.currentBrewProfile = this._brewProfile;
@@ -138,6 +140,7 @@ class AddBrewProfileWidget extends StatelessWidget {
                 child: RaisedButton(
           child: Text("Add New Brew Profile"),
           onPressed: () {
+            onPressDefaultVibrate();
             Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewBrewProfileScreen(tea)));
           },
         )))
