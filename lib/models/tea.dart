@@ -73,14 +73,16 @@ class Tea {
       existingBrewProfile.isFavorite = false;
     });
     brewProfile.isFavorite = true;
+
     await teasCollection.push(this);
   }
 
   Future removeBrewProfile(BrewProfile brewProfile) async {
-    final newBrewProfiles = this.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile);
+    final newBrewProfiles = this.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile).toList();
     if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
       newBrewProfiles.first.isFavorite = true;
     }
+    this.brewProfiles = newBrewProfiles;
     await teasCollection.push(this);
   }
 
