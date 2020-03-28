@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:teavault/screens/authentication/sign_in.dart';
 import 'package:teavault/services/auth.dart';
 
@@ -30,6 +29,7 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
       this._currentUser = authService.lastKnownUser;
     });
   }
+
   @override
   void initState() {
     super.initState();

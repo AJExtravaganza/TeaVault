@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:teavault/models/brewing_vessel.dart';
 import 'package:teavault/models/tea_collection.dart';
@@ -66,6 +65,7 @@ class MyApp extends StatelessWidget {
       title: 'TeaVault',
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
+        primaryTextTheme: Typography().white,
       ),
       home: HomeView(),
     );

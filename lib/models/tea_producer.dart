@@ -22,7 +22,11 @@ class TeaProducer {
   static TeaProducer fromDocumentSnapshot(DocumentSnapshot producerDocument) {
     final data = producerDocument.data;
     return TeaProducer(
-        data['name'], data['short_name'], data['submitted_by_user_with_profile_id'], producerDocument.documentID, );
+      data['name'],
+      data['short_name'],
+      data['submitted_by_user_with_profile_id'],
+      producerDocument.documentID,
+    );
   }
 
   bool operator ==(dynamic other) => other is TeaProducer && this.name == other.name;

@@ -49,13 +49,13 @@ class AuthService {
 
     final userProfile = await fetchUserProfile();
     if (userProfile != null) {
-    _lastKnownUserProfileId = userProfile.documentID;
-    print('Success.');
+      _lastKnownUserProfileId = userProfile.documentID;
+      print('Success.');
     } else {
-    print('Could not find existing profile for user.\nCreating new profile...');
-    final newUserProfile = await initialiseNewUserProfile();
-    _lastKnownUserProfileId = newUserProfile.documentID;
-    print('Success.');
+      print('Could not find existing profile for user.\nCreating new profile...');
+      final newUserProfile = await initialiseNewUserProfile();
+      _lastKnownUserProfileId = newUserProfile.documentID;
+      print('Success.');
     }
   }
 

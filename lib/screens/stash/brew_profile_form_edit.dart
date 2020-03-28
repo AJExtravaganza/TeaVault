@@ -16,7 +16,21 @@ class EditBrewProfileScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Edit Existing Brew Profile'),
       ),
-      body: BrewProfileEditForm(this._tea, this._brewProfile),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: MediaQuery.of(context).orientation == Orientation.portrait ? 2 : 0,
+            child: Container(),
+          ),
+          Expanded(
+            flex: 4,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 50.0),
+              child: BrewProfileEditForm(this._tea, this._brewProfile),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:teavault/main.dart';
 import 'package:teavault/models/tea.dart';
 import 'package:teavault/models/tea_collection.dart';
-import 'package:teavault/screens/stash/stash_tea_form.dart';
 import 'package:teavault/screens/stash/brew_profiles_screen.dart';
 import 'package:teavault/screens/stash/stash_tea_form_add.dart';
 import 'package:teavault/screens/stash/stash_tea_form_edit.dart';
@@ -38,6 +37,8 @@ StatelessWidget getAddTeaListItem(BuildContext context) {
       Expanded(
           child: Center(
               child: RaisedButton(
+        color: Colors.lightGreen,
+        textColor: Colors.white,
         child: Text("Add New Tea"),
         onPressed: () {
           onPressDefaultVibrate();
@@ -74,7 +75,12 @@ class StashListItem extends StatelessWidget {
                   if (result == StashTileInteraction.brewProfiles) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => BrewProfilesScreen(tea)));
                   } else if (result == StashTileInteraction.modifyQuantity) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => StashTeaEdit(tea: this.tea,)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StashTeaEdit(
+                                  tea: this.tea,
+                                )));
                   } else if (result == StashTileInteraction.remove) {
                     teasCollection.remove(tea);
                   } else {

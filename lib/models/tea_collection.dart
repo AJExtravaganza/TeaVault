@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/models/tea.dart';
-import 'package:teavault/models/tea_production_collection.dart';
 import 'package:teavault/models/user.dart';
 import 'package:teavault/services/auth.dart';
 
@@ -98,12 +97,12 @@ class TeaCollectionModel extends ChangeNotifier {
           if (documentChange.type == DocumentChangeType.removed) {
             this._items.remove(documentChange.document.documentID);
           } else {
-             try{
-               final newTea = Tea.fromDocumentSnapshot(document);
-               this._items[newTea.id] = newTea;
-             } on Exception catch (err) {
-                print('Error: $err\nTea not added to TeaCollection');
-             }
+            try {
+              final newTea = Tea.fromDocumentSnapshot(document);
+              this._items[newTea.id] = newTea;
+            } on Exception catch (err) {
+              print('Error: $err\nTea not added to TeaCollection');
+            }
           }
           notifyListeners();
         });

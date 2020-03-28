@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:teavault/screens/stash/brew_profiles_screen.dart';
@@ -39,9 +38,9 @@ void selectTeaFromStash(BuildContext context) {
   });
 }
 
-void onPressDefaultVibrate() =>   Vibration.vibrate(duration: 10, intensities: [127]);
+void onPressDefaultVibrate() => Vibration.vibrate(duration: 10, intensities: [127]);
 
 Function haptic(Function fn) => () {
-  onPressDefaultVibrate();
-  fn();
-};
+      onPressDefaultVibrate();
+      fn();
+    };

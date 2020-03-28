@@ -155,7 +155,7 @@ class BrewProfileFormState extends State<BrewProfileForm> {
             },
             keyboardType: TextInputType.number),
         RaisedButton(
-            color: Colors.blue,
+            color: Colors.lightGreen,
             textColor: Colors.white,
             child: new Text('Save Brew Profile'),
             onPressed: () async {

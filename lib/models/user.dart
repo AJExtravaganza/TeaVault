@@ -31,7 +31,8 @@ Future<DocumentSnapshot> initialiseNewUserProfile() async {
 Map<String, dynamic> createUserJson(FirebaseUser user) {
   return {
     'uid': user.uid,
-    'username': 'Username Placeholder',
-    'display_name': 'Display Name Placeholder',
+    'email': user.email,
+    'registered_at': user.metadata.creationTime,
+    'display_name': null,
   };
 }

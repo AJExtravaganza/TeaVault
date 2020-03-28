@@ -11,10 +11,22 @@ class AddNewBrewProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add New Brew Profile'),
+      appBar: AppBar(title: Text('Add New Brew Profile'), iconTheme: IconThemeData(color: Colors.white)),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: MediaQuery.of(context).orientation == Orientation.portrait ? 4 : 1,
+            child: Container(),
+          ),
+          Expanded(
+            flex: 16,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 50.0),
+              child: BrewProfileAddForm(this._tea),
+            ),
+          ),
+        ],
       ),
-      body: BrewProfileAddForm(this._tea),
     );
   }
 }

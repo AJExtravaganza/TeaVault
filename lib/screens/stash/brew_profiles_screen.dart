@@ -21,9 +21,7 @@ class BrewProfilesScreen extends StatelessWidget {
     this._tea = teasCollection.getUpdated(_tea);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Select a Brew Profile'),
-      ),
+      appBar: AppBar(title: Text('Select a Brew Profile'), iconTheme: IconThemeData(color: Colors.white)),
       body: BrewProfilesListView(this._tea, suppressTileMenu: this.suppressTileMenu),
     );
   }
@@ -138,6 +136,8 @@ class AddBrewProfileWidget extends StatelessWidget {
         Expanded(
             child: Center(
                 child: RaisedButton(
+          color: Colors.lightGreen,
+          textColor: Colors.white,
           child: Text("Add New Brew Profile"),
           onPressed: () {
             onPressDefaultVibrate();

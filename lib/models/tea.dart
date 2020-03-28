@@ -49,7 +49,7 @@ class Tea {
   }
 
   void validate() {
-    if (teaProductionsCollection.getById(_productionId)==null) {
+    if (teaProductionsCollection.getById(_productionId) == null) {
       throw Exception('No such TeaProduction $_productionId accessible in db by this user');
     }
   }
@@ -79,7 +79,8 @@ class Tea {
   }
 
   Future removeBrewProfile(BrewProfile brewProfile) async {
-    final newBrewProfiles = this.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile).toList();
+    final newBrewProfiles =
+        this.brewProfiles.where((existingBrewProfile) => existingBrewProfile != brewProfile).toList();
     if (brewProfile.isFavorite && newBrewProfiles.length > 0) {
       newBrewProfiles.first.isFavorite = true;
     }

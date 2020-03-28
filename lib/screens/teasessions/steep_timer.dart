@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:teavault/models/brew_profile.dart';
 import 'package:teavault/tea_session_controller.dart';
 
@@ -249,7 +248,7 @@ class TimerMuteIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: haptic(()=>controller.muted = !controller.muted),
+      onPressed: haptic(() => controller.muted = !controller.muted),
       alignment: Alignment.center,
       icon: Icon(controller.muted ? Icons.notifications_off : Icons.notifications_active),
     );
@@ -322,13 +321,13 @@ class BrewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (controller.active) {
       return IconButton(
-        onPressed: haptic(()=>controller.stopBrewTimer()),
+        onPressed: haptic(() => controller.stopBrewTimer()),
         icon: Icon(Icons.pause),
         alignment: Alignment.center,
       );
     } else if (controller.timeRemaining.inSeconds > 0) {
       return IconButton(
-        onPressed: haptic(()=>controller.startBrewTimer()),
+        onPressed: haptic(() => controller.startBrewTimer()),
         icon: Icon(Icons.play_arrow),
         alignment: Alignment.center,
       );

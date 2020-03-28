@@ -9,7 +9,6 @@ import 'package:teavault/models/tea_production.dart';
 import 'package:teavault/models/tea_production_collection.dart';
 import 'package:teavault/services/auth.dart';
 
-
 class StashTeaForm extends StatefulWidget {
   final bool editExisting;
   final Tea tea;
@@ -39,6 +38,7 @@ class StashTeaFormState extends State<StashTeaForm> {
   int userDefinedProductionYear;
 
   get newUserDefinedProducer => _producerIsUserDefined;
+
   get newUserDefinedProduction => _productionIsUserDefined;
 
   set userDefined(value) {
@@ -60,8 +60,7 @@ class StashTeaFormState extends State<StashTeaForm> {
   TeaProduction _production;
   int _quantity;
 
-  StashTeaFormState([this.editExisting, this.existingTea]) {
-  }
+  StashTeaFormState([this.editExisting, this.existingTea]) {}
 
   TeaProducer get producer => this._producer;
 
@@ -132,8 +131,20 @@ class StashTeaFormState extends State<StashTeaForm> {
     return Form(
       key: _formKey,
       child: new ListView(children: <Widget>[
-        this.newUserDefinedProducer ? Column(children: <Widget>[CreateProducerNameField(this), CreateProducerShortNameField(this)],) : ProducerDropdown(this, this.editExisting),
-        this.newUserDefinedProduction ? Column(children: <Widget>[CreateProductionNameField(this), CreateProductionYearField(this), CreateProductionWeightField(this)],) : ProductionDropdown(this, this.editExisting),
+        this.newUserDefinedProducer
+            ? Column(
+                children: <Widget>[CreateProducerNameField(this), CreateProducerShortNameField(this)],
+              )
+            : ProducerDropdown(this, this.editExisting),
+        this.newUserDefinedProduction
+            ? Column(
+                children: <Widget>[
+                  CreateProductionNameField(this),
+                  CreateProductionYearField(this),
+                  CreateProductionWeightField(this)
+                ],
+              )
+            : ProductionDropdown(this, this.editExisting),
         QuantityField(this),
         SubmitButton(this),
       ]),
@@ -147,12 +158,18 @@ class StashTeaFormState extends State<StashTeaForm> {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Adding new tea to stash...')));
 
       if (newUserDefinedProducer) {
-        final newProducer = await teaProducersCollection.put(TeaProducer(this.userDefinedProducerName, this.userDefinedProducerShortName, authService.lastKnownUserProfileId));
+        final newProducer = await teaProducersCollection.put(TeaProducer(
+            this.userDefinedProducerName, this.userDefinedProducerShortName, authService.lastKnownUserProfileId));
         this.producer = teaProducersCollection.getById(newProducer.documentID);
       }
 
       if (newUserDefinedProduction) {
-        final newProduction = await teaProductionsCollection.put(TeaProduction(userDefinedProductionName, userDefinedNominalWeightGrams, this.producer.id, this.userDefinedProductionYear, authService.lastKnownUserProfileId));
+        final newProduction = await teaProductionsCollection.put(TeaProduction(
+            userDefinedProductionName,
+            userDefinedNominalWeightGrams,
+            this.producer.id,
+            this.userDefinedProductionYear,
+            authService.lastKnownUserProfileId));
         this._production = teaProductionsCollection.getById(newProduction.documentID);
       }
 
@@ -165,7 +182,6 @@ class StashTeaFormState extends State<StashTeaForm> {
 class ProducerDropdown extends StatelessWidget {
   final StashTeaFormState state;
   final bool editExisting;
-
 
   ProducerDropdown(this.state, [this.editExisting = false]);
 
@@ -227,8 +243,7 @@ class CreateProducerNameField extends StatelessWidget {
         },
         onSaved: (value) {
           state.userDefinedProducerName = value;
-        }
-    );
+        });
   }
 }
 
@@ -249,8 +264,7 @@ class CreateProducerShortNameField extends StatelessWidget {
         },
         onSaved: (value) {
           state.userDefinedProducerShortName = value;
-        }
-    );
+        });
   }
 }
 
@@ -258,7 +272,7 @@ class ProductionDropdown extends StatelessWidget {
   final StashTeaFormState state;
   final bool editExisting;
 
-  ProductionDropdown(this.state, [this.editExisting=false]);
+  ProductionDropdown(this.state, [this.editExisting = false]);
 
   @override
   Widget build(BuildContext context) {
@@ -267,13 +281,16 @@ class ProductionDropdown extends StatelessWidget {
       value: StashTeaFormState.userDefinedReservedProductionValue,
     );
 
-    final listItems = [userSubmissionListItem,] + teaProductionsCollection.items
-        .map((production) => DropdownMenuItem(
-              child: Text(production.asString()),
-              value: production,
-            ))
-        .where((dropdownListItem) => (state.producer == null || dropdownListItem.value.producer == state.producer))
-        .toList();
+    final listItems = [
+          userSubmissionListItem,
+        ] +
+        teaProductionsCollection.items
+            .map((production) => DropdownMenuItem(
+                  child: Text(production.asString()),
+                  value: production,
+                ))
+            .where((dropdownListItem) => (state.producer == null || dropdownListItem.value.producer == state.producer))
+            .toList();
     return Consumer<TeaProductionCollectionModel>(
       builder: (context, productions, child) => DropdownButtonFormField(
           items: !this.editExisting ? listItems : null,
@@ -315,8 +332,7 @@ class CreateProductionNameField extends StatelessWidget {
         },
         onSaved: (value) {
           state.userDefinedProductionName = value;
-        }
-    );
+        });
   }
 }
 
@@ -396,7 +412,7 @@ class SubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-        color: Colors.blue,
+        color: Colors.lightGreen,
         textColor: Colors.white,
         child: new Text('Add to Stash'),
         onPressed: () async {
