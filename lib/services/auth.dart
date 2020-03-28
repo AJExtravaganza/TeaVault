@@ -25,35 +25,44 @@ class AuthService {
 
   String get lastKnownUserProfileId => _lastKnownUserProfileId;
 
-  Future<FirebaseUser> signInAnonymously() async {
+  Future<FirebaseUser> signInWithEmailAndPassword(String emailAddress, String password) async {
     try {
-      AuthResult result = await _auth.signInAnonymously();
+      AuthResult result = await _auth.signInWithEmailAndPassword(email: emailAddress, password: password);
       _lastKnownUser = result.user;
-      print('Attempting to load user profile for uid "${result.user.uid}"...');
 
-      final userProfile = await fetchUserProfile();
-      if (await fetchUserProfile() != null) {
-        _lastKnownUserProfileId = userProfile.documentID;
-        print('Success.');
-      } else {
-        print('Could not find existing profile for user.\nCreating new profile...');
-        final newUserProfile = await initialiseNewUserProfile();
-        _lastKnownUserProfileId = newUserProfile.documentID;
-        print('Success.');
-      }
-      print('Signed in anonymously as user "${result.user.uid} with users document id ${_lastKnownUserProfileId}"');
+      print('Attempting to load user profile for uid "${result.user.uid}"...');
+      await loadUserProfile();
+      print('Signed in as user "${result.user.uid} with users document id $_lastKnownUserProfileId"');
     } catch (err) {
       _lastKnownUser = null;
       _lastKnownUserProfileId = null;
-      throw AuthException(null, "Anonymous authentication failed: ${err.toString()}");
+      throw AuthException(null, "Email-based authentication failed: ${err.toString()}");
     }
 
     return currentUser;
   }
 
-//  email signin
+  Future loadUserProfile() async {
+    if (_lastKnownUser == null) {
+      throw new Exception('No user is currently logged in');
+    }
 
-//email register
+    final userProfile = await fetchUserProfile();
+    if (userProfile != null) {
+    _lastKnownUserProfileId = userProfile.documentID;
+    print('Success.');
+    } else {
+    print('Could not find existing profile for user.\nCreating new profile...');
+    final newUserProfile = await initialiseNewUserProfile();
+    _lastKnownUserProfileId = newUserProfile.documentID;
+    print('Success.');
+    }
+  }
+
+  Future<FirebaseUser> registerWithEmailAndPassword(String emailAddress, String password) async {
+    final result = await _auth.createUserWithEmailAndPassword(email: emailAddress, password: password);
+    return result.user;
+  }
 
   Future signOut() async {
     _lastKnownUser = null;

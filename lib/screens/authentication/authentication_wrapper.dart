@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:teavault/screens/authentication/sign_in.dart';
 import 'package:teavault/services/auth.dart';
 
 //Serves sign-in screen when not logged in, and listens to changes in authentication state
@@ -21,15 +23,13 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
   FirebaseUser get currentUser => _currentUser;
 
-  Future signInAnonymously() async {
-    final user = await authService.signInAnonymously();
-    setState(() {
-      _currentUser = user;
-    });
-  }
-
   AuthenticationWrapperState(this._childBuilder);
 
+  void refresh() {
+    setState(() {
+      this._currentUser = authService.lastKnownUser;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -47,11 +47,8 @@ class AuthenticationWrapperState extends State<AuthenticationWrapper> {
 //      print('Displaying home screen');
       return _childBuilder();
     } else {
-      //TODO: Remove this auto-sign-in when proper sign-in and login persistence is implemented
-      signInAnonymously();
-      return Container();
 //      print('Displaying sign-in screen');
-//      return SignIn();
+      return SignIn();
     }
   }
 }
