@@ -32,18 +32,10 @@ class TeaProduction {
       other.producer == producer &&
       other.productionYear == productionYear;
 
-  void validate() {
-    if (teaProducersCollection.getById(_producerId) == null) {
-      throw Exception('No such TeaProduction $_producerId accessible in db by this user');
-    }
-    ;
-  }
-
   static TeaProduction fromDocumentSnapshot(DocumentSnapshot productionDocument) {
     final data = productionDocument.data;
     final newProduction = TeaProduction(data['name'], data['nominal_weight_grams'], data['producer'],
         data['production_year'], data['submitted_by_user_with_profile_id'], productionDocument.documentID);
-    newProduction.validate();
     return newProduction;
   }
 }
